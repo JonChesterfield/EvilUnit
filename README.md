@@ -1,5 +1,6 @@
-# EvilUnit
-A library for facilitating unit testing in C89.
+EvilUnit is a library for facilitating unit testing in C89.
+
+Copyright 2015 Jon Chesterfield. All rights reserved.
 
 Not ready for production use. 
 
