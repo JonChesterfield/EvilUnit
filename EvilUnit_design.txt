@@ -1,0 +1,15 @@
+This library is intended to reduce the labour involved in writing test cases for C. The design is unusual because the design constraints are unreasonable:
+
+1/ The implementation is C89. Entirely strict C89 if desired, though a reduction in typing is available if your compiler provides the __COUNTER__ extension. The three I am working with (Clang, GCC, MSVC) all do so.
+
+2/ Tests will self-install. There is no need to write a function prototype elsewhere, or to register the test in a suite somewhere. 
+
+3/ Tests will run in parallel. Minimising the time a suite takes to run is worthwhile. 
+
+4/ No function pointers. Executing a test in another process allows catching segfaults, infinite loops and the like - but becomes unreasonably difficult if the test is identified by a function pointer. Essentially pointers are hard to serialise. 
+
+5/ Easy to use in exising projects. Specifically, no external dependencies beyond the C standard library and an easy compilation model for the end user.
+
+Design was driven mostly by the requirement to self-install tests and to allow running tests in a different address space. The former is achieved by reckless use of the preprocessor and recursion, the latter is achieved using an addressing scheme in place of function pointers. That is, calls resemble go-to-here-then-call-function-foo, instead of using a function pointer to foo. 
+
+The premise is to organise a set of tests in files containing a language that closely resembles C. Each file is viewed as a node in a graph defining the test dependencies. Compilation therefore turns each file into a single exposed function, called traverse, which allows functions within the library to traverse this graph. Provided one file is marked "main", or "root", to provide a starting point, considerable control can be applied to how the test modules are executed. At present, a breadth first search from the root node creates a set of test modules which are executed sequentially, avoiding running the same case twice. Revisions in the near future will change this to execute the leaves first.
