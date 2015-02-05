@@ -51,18 +51,10 @@
 #ifdef BUILD_PHASE_16
 #undef BUILD_PHASE_16
 #endif
-#ifdef BUILD_PHASE_11
-#undef BUILD_PHASE_11
-#define BUILD_PHASE_16
-#undef RECURSIVE
-#endif
-#ifdef BUILD_PHASE_10
-#undef BUILD_PHASE_10
-#define BUILD_PHASE_11
-#endif
 #ifdef BUILD_PHASE_07
 #undef BUILD_PHASE_07
-#define BUILD_PHASE_10
+#define BUILD_PHASE_16
+#undef RECURSIVE
 #endif
 #ifdef BUILD_PHASE_06
 #undef BUILD_PHASE_06
@@ -280,7 +272,12 @@ static void EvilUnit_Disguise_setup_teardown(void)
 #ifdef BUILD_PHASE_02
 /* First pass - declarations based on DEPENDS() and internal_get_number_of_tests */
 /* Cannot use MODULE definition or test whether the test file is empty or not */
-#define DEPENDS(X) int MAKETEST_CONCAT(run_all_tests_,X)(void);
+/* Can declare external function prototypes */
+#ifdef __cplusplus
+#define DEPENDS(X) extern "C" { int MAKETEST_CONCAT(EvilUnitTraverse_,X)(struct EvilUnitAddress * address, size_t depth, struct EvilUnitTraverseFunction * function_to_call, size_t * numeric_parameter, struct EvilUnitTestModule * module_parameter); }
+#else
+#define DEPENDS(X) int MAKETEST_CONCAT(EvilUnitTraverse_,X)(struct EvilUnitAddress * address, size_t depth, struct EvilUnitTraverseFunction * function_to_call, size_t * numeric_parameter, struct EvilUnitTestModule * module_parameter);
+#endif
 #define METHOD_PROLOG() static struct EvilUnitTestResult internal_get_number_of_tests(size_t * running_total) {size_t local_total = 0; SETUP();
 #define TEST_BLOCK_HEADER(X,Y) local_total++; if (0)
 #define METHOD_EPILOG() *running_total = local_total; TEARDOWN(); return PASS("Tests enumerated");}
@@ -462,6 +459,7 @@ static int GetNumberOfDependencies(size_t * number);
 static int GetNumberOfLocalTests(size_t * number);
 static int RunAllTests(struct EvilUnitTestModule * module);
 #ifdef __cplusplus
+/* Prototype is declared here because it is otherwise difficult to wrap in extern "C" */
 extern "C" {
 int MAKETEST_CONCAT(EvilUnitTraverse_,MODULE)(struct EvilUnitAddress * address, size_t depth, struct EvilUnitTraverseFunction * function_to_call, size_t * numeric_parameter, struct EvilUnitTestModule * module_parameter);
 }
@@ -1143,351 +1141,12 @@ METHOD_EPILOG()
 #ifdef return
 #undef return
 #endif
-#define METHOD_PROLOG() static struct EvilUnitTestResult call_test_by_number(size_t test_number) { size_t local_number = 0; (void)local_number;
-#define TEST_BLOCK_HEADER(X,Y) if (test_number == local_number) { return GENTESTNAME(X,Y)(); } local_number++; if (0)
-#define METHOD_EPILOG() return FAIL("Could not call test number %li",(long)test_number);}
-#define EVILUNIT_EQUIVALENT_INCLUDE_MANGLE_TESTS_HERE
-#include "EvilUnit.h"
-#ifndef MACROLEVEL
-#define MACROLEVEL 10
-#endif
-#if (defined (GENERATE_SINGLE_FUNCTION) && defined (GENERATE_TEST_FUNCTIONS))
-#error "Cannot define both generate_single_function and generate_test_functions"
-#endif
-#ifndef GENERATE_TEST_FUNCTIONS
-#define GENERATE_SINGLE_FUNCTION
-#endif
-#ifdef DISABLEDEPENDS
-#ifdef DEPENDS
-#undef DEPENDS
-#endif
-#endif
-#ifndef DEPEND_PROLOG
-#define DEPEND_PROLOG()
-#endif
-#ifndef DEPENDS
-#define DEPENDS(X)
-#endif
-#ifndef DEPEND_EPILOG
-#define DEPEND_EPILOG()
-#endif
-#ifndef METHOD_PROLOG
-#define METHOD_PROLOG()
-#endif
-#ifndef TEST_BLOCK_HEADER
-#error "Require macro definition of TEST_BLOCK_HEADER"
-#endif
-#ifndef METHOD_EPILOG
-#define METHOD_EPILOG()
-#endif
-#define FIRST_TEST_RUN(X,Y) DEPEND_EPILOG() METHOD_PROLOG() SIMPLE_TEST_RUN(X,Y)
-#define OTHER_TEST_RUN(X,Y) FINALISE_TEST_RUN() SIMPLE_TEST_RUN(X,Y)
-#if (! defined (GENERATE_TEST_FUNCTIONS) && ! defined (GENERATE_SINGLE_FUNCTION) )
-#error "Need to define one of GENERATE_TEST_FUNCTIONS or GENERATE_SINGLE_FUNCTION";
-#endif
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
-#define FINALISE_TEST_RUN() }} OPTIONAL_USER_TEARDOWN_LABEL() if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() SETUP();
-#define FINALISE_TEST_RUN() OPTIONAL_USER_TEARDOWN_LABEL() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
-#endif
-/* There is currently no setup label as nothing needs to jump to there */
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define OPTIONAL_USER_TEARDOWN_LABEL() EvilUnit_Phase = UNITTEST_TEARDOWN;
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define OPTIONAL_USER_TEARDOWN_LABEL()
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_TEST_FUNCTIONS)
-#if (MACROLEVEL > 2)
-#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
-#define EvilUnit_TEARDOWN_BLOCK }} EvilUnit_Phase = FRAMEWORK_FINAL_RETURN; EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); if (EvilUnit_ctrl.do_fixture_teardown) { return FAKE(""); } RETURNVALUE = FAIL("FrameworkError"); return FAKE("");
-#endif
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define EvilUnit_STARTUP_BLOCK
-#define EvilUnit_TEARDOWN_BLOCK
-#endif
-#if defined(GENERATE_TEST_FUNCTIONS)
-#if (MACROLEVEL > 3)
-#define EvilUnit_LOCAL_VARIABLES enum EvilUnit_PHASE EvilUnit_Phase = FRAMEWORK_SETUP; bool RETURNFLAG = true; struct EvilUnitTestResult RETURNVALUE = FAIL("Did not set return value"); struct EvilUnit_Control EvilUnit_ctrl = EvilUnit_Control_Initial(); (void) RETURNVALUE; (void) RETURNFLAG
-#endif
-#if (MACROLEVEL > 3)
-#define EvilUnit_FINAL_RETURN EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); return FAKE("")
-#endif
-#if (MACROLEVEL > 4)
-#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
-#endif
-#endif
-DEPEND_PROLOG()
-#endif
-#ifdef MODULETESTFILE
-#include MAKETEST_EXPAND_AND_QUOTE(MODULETESTFILE)
-#endif
-#ifdef BUILD_PHASE_10
-/* Now conclude and clean up the macros */
-#ifndef TESTMODULE_IS_EMPTY
-#if (PREDICTED_COUNTER == __COUNTER__) /* Only true if there are no tests listed */
-#define TESTMODULE_IS_EMPTY 1
-#endif
-#endif
-#ifdef TESTMODULE_IS_EMPTY
-DEPEND_EPILOG()
-METHOD_PROLOG()
-METHOD_EPILOG()
-#else
-FINALISE_TEST_RUN()
-METHOD_EPILOG()
-#endif
-#undef CLEANUP_MACROS
-#ifdef DEPEND_PROLOG
-#undef DEPEND_PROLOG
-#endif
-#ifdef DEPENDS
-#undef DEPENDS
-#endif
-#ifdef DEPEND_EPILOG
-#undef DEPEND_EPILOG
-#endif
-#ifdef METHOD_PROLOG
-#undef METHOD_PROLOG
-#endif
-#ifdef TEST_BLOCK_HEADER
-#undef TEST_BLOCK_HEADER
-#endif
-#ifdef METHOD_EPILOG
-#undef METHOD_EPILOG
-#endif
-#ifdef EvilUnit_FINAL_RETURN
-#undef EvilUnit_FINAL_RETURN
-#endif
-#ifdef EvilUnit_JUNCTION_CODE
-#undef EvilUnit_JUNCTION_CODE
-#endif
-#ifdef EvilUnit_LOCAL_VARIABLES
-#undef EvilUnit_LOCAL_VARIABLES
-#endif
-#ifdef EvilUnit_STARTUP_BLOCK
-#undef EvilUnit_STARTUP_BLOCK
-#endif
-#ifdef EvilUnit_TEARDOWN_BLOCK
-#undef EvilUnit_TEARDOWN_BLOCK
-#endif
-#ifdef FINALISE_TEST_RUN
-#undef FINALISE_TEST_RUN
-#endif
-#ifdef FIRST_TEST_RUN
-#undef FIRST_TEST_RUN
-#endif
-#ifdef GENERATE_SINGLE_FUNCTION
-#undef GENERATE_SINGLE_FUNCTION
-#endif
-#ifdef GENERATE_TEST_FUNCTIONS
-#undef GENERATE_TEST_FUNCTIONS
-#endif
-#ifdef MACROLEVEL
-#undef MACROLEVEL
-#endif
-#ifdef OPTIONAL_USER_SETUP_LABEL
-#undef OPTIONAL_USER_SETUP_LABEL
-#endif
-#ifdef OPTIONAL_USER_TEARDOWN_LABEL
-#undef OPTIONAL_USER_TEARDOWN_LABEL
-#endif
-#ifdef OTHER_TEST_RUN
-#undef OTHER_TEST_RUN
-#endif
-#ifdef SIMPLE_TEST_RUN
-#undef SIMPLE_TEST_RUN
-#endif
-#ifdef TEST_BLOCK_HEADER
-#undef TEST_BLOCK_HEADER
-#endif
-#ifdef return
-#undef return
-#endif
-#ifdef __cplusplus
-#define DEPENDS(X) extern "C" { int MAKETEST_CONCAT(EvilUnitTraverse_,X)(struct EvilUnitAddress * address, size_t depth, struct EvilUnitTraverseFunction * function_to_call, size_t * numeric_parameter, struct EvilUnitTestModule * module_parameter); }
-#else
-#define DEPENDS(X) int MAKETEST_CONCAT(EvilUnitTraverse_,X)(struct EvilUnitAddress * address, size_t depth, struct EvilUnitTraverseFunction * function_to_call, size_t * numeric_parameter, struct EvilUnitTestModule * module_parameter);
-#endif
-#define METHOD_PROLOG() static struct EvilUnitTestResult null_function_10(void) {
-#define TEST_BLOCK_HEADER(X,Y) if (0)
-#define METHOD_EPILOG() return FAIL("Called null_function_10"); }
-#define EVILUNIT_EQUIVALENT_INCLUDE_MANGLE_TESTS_HERE
-#include "EvilUnit.h"
-#ifndef MACROLEVEL
-#define MACROLEVEL 10
-#endif
-#if (defined (GENERATE_SINGLE_FUNCTION) && defined (GENERATE_TEST_FUNCTIONS))
-#error "Cannot define both generate_single_function and generate_test_functions"
-#endif
-#ifndef GENERATE_TEST_FUNCTIONS
-#define GENERATE_SINGLE_FUNCTION
-#endif
-#ifdef DISABLEDEPENDS
-#ifdef DEPENDS
-#undef DEPENDS
-#endif
-#endif
-#ifndef DEPEND_PROLOG
-#define DEPEND_PROLOG()
-#endif
-#ifndef DEPENDS
-#define DEPENDS(X)
-#endif
-#ifndef DEPEND_EPILOG
-#define DEPEND_EPILOG()
-#endif
-#ifndef METHOD_PROLOG
-#define METHOD_PROLOG()
-#endif
-#ifndef TEST_BLOCK_HEADER
-#error "Require macro definition of TEST_BLOCK_HEADER"
-#endif
-#ifndef METHOD_EPILOG
-#define METHOD_EPILOG()
-#endif
-#define FIRST_TEST_RUN(X,Y) DEPEND_EPILOG() METHOD_PROLOG() SIMPLE_TEST_RUN(X,Y)
-#define OTHER_TEST_RUN(X,Y) FINALISE_TEST_RUN() SIMPLE_TEST_RUN(X,Y)
-#if (! defined (GENERATE_TEST_FUNCTIONS) && ! defined (GENERATE_SINGLE_FUNCTION) )
-#error "Need to define one of GENERATE_TEST_FUNCTIONS or GENERATE_SINGLE_FUNCTION";
-#endif
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
-#define FINALISE_TEST_RUN() }} OPTIONAL_USER_TEARDOWN_LABEL() if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() SETUP();
-#define FINALISE_TEST_RUN() OPTIONAL_USER_TEARDOWN_LABEL() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
-#endif
-/* There is currently no setup label as nothing needs to jump to there */
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define OPTIONAL_USER_TEARDOWN_LABEL() EvilUnit_Phase = UNITTEST_TEARDOWN;
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define OPTIONAL_USER_TEARDOWN_LABEL()
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_TEST_FUNCTIONS)
-#if (MACROLEVEL > 2)
-#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
-#define EvilUnit_TEARDOWN_BLOCK }} EvilUnit_Phase = FRAMEWORK_FINAL_RETURN; EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); if (EvilUnit_ctrl.do_fixture_teardown) { return FAKE(""); } RETURNVALUE = FAIL("FrameworkError"); return FAKE("");
-#endif
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define EvilUnit_STARTUP_BLOCK
-#define EvilUnit_TEARDOWN_BLOCK
-#endif
-#if defined(GENERATE_TEST_FUNCTIONS)
-#if (MACROLEVEL > 3)
-#define EvilUnit_LOCAL_VARIABLES enum EvilUnit_PHASE EvilUnit_Phase = FRAMEWORK_SETUP; bool RETURNFLAG = true; struct EvilUnitTestResult RETURNVALUE = FAIL("Did not set return value"); struct EvilUnit_Control EvilUnit_ctrl = EvilUnit_Control_Initial(); (void) RETURNVALUE; (void) RETURNFLAG
-#endif
-#if (MACROLEVEL > 3)
-#define EvilUnit_FINAL_RETURN EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); return FAKE("")
-#endif
-#if (MACROLEVEL > 4)
-#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
-#endif
-#endif
-DEPEND_PROLOG()
-#endif
-#ifdef MODULETESTFILE
-#include MAKETEST_EXPAND_AND_QUOTE(MODULETESTFILE)
-#endif
-#ifdef BUILD_PHASE_11
-/* Now conclude and clean up the macros */
-#ifndef TESTMODULE_IS_EMPTY
-#if (PREDICTED_COUNTER == __COUNTER__) /* Only true if there are no tests listed */
-#define TESTMODULE_IS_EMPTY 1
-#endif
-#endif
-#ifdef TESTMODULE_IS_EMPTY
-DEPEND_EPILOG()
-METHOD_PROLOG()
-METHOD_EPILOG()
-#else
-FINALISE_TEST_RUN()
-METHOD_EPILOG()
-#endif
-#undef CLEANUP_MACROS
-#ifdef DEPEND_PROLOG
-#undef DEPEND_PROLOG
-#endif
-#ifdef DEPENDS
-#undef DEPENDS
-#endif
-#ifdef DEPEND_EPILOG
-#undef DEPEND_EPILOG
-#endif
-#ifdef METHOD_PROLOG
-#undef METHOD_PROLOG
-#endif
-#ifdef TEST_BLOCK_HEADER
-#undef TEST_BLOCK_HEADER
-#endif
-#ifdef METHOD_EPILOG
-#undef METHOD_EPILOG
-#endif
-#ifdef EvilUnit_FINAL_RETURN
-#undef EvilUnit_FINAL_RETURN
-#endif
-#ifdef EvilUnit_JUNCTION_CODE
-#undef EvilUnit_JUNCTION_CODE
-#endif
-#ifdef EvilUnit_LOCAL_VARIABLES
-#undef EvilUnit_LOCAL_VARIABLES
-#endif
-#ifdef EvilUnit_STARTUP_BLOCK
-#undef EvilUnit_STARTUP_BLOCK
-#endif
-#ifdef EvilUnit_TEARDOWN_BLOCK
-#undef EvilUnit_TEARDOWN_BLOCK
-#endif
-#ifdef FINALISE_TEST_RUN
-#undef FINALISE_TEST_RUN
-#endif
-#ifdef FIRST_TEST_RUN
-#undef FIRST_TEST_RUN
-#endif
-#ifdef GENERATE_SINGLE_FUNCTION
-#undef GENERATE_SINGLE_FUNCTION
-#endif
-#ifdef GENERATE_TEST_FUNCTIONS
-#undef GENERATE_TEST_FUNCTIONS
-#endif
-#ifdef MACROLEVEL
-#undef MACROLEVEL
-#endif
-#ifdef OPTIONAL_USER_SETUP_LABEL
-#undef OPTIONAL_USER_SETUP_LABEL
-#endif
-#ifdef OPTIONAL_USER_TEARDOWN_LABEL
-#undef OPTIONAL_USER_TEARDOWN_LABEL
-#endif
-#ifdef OTHER_TEST_RUN
-#undef OTHER_TEST_RUN
-#endif
-#ifdef SIMPLE_TEST_RUN
-#undef SIMPLE_TEST_RUN
-#endif
-#ifdef TEST_BLOCK_HEADER
-#undef TEST_BLOCK_HEADER
-#endif
-#ifdef return
-#undef return
-#endif
 #define DEPEND_PROLOG() int MAKETEST_CONCAT(EvilUnitTraverse_,MODULE)(struct EvilUnitAddress * address, size_t depth, struct EvilUnitTraverseFunction * function_to_call, size_t * numeric_parameter, struct EvilUnitTestModule * module_parameter) { size_t next_route; size_t local_number = 0; int rc; if (EvilUnit_traverse_at_destination(address,depth)) { switch (function_to_call->func) { case EnumGetIdentity: return EvilUnitGetIdentity(address, module_parameter,LOCALMODULENAME); case EnumGetNumberOfDependencies: return GetNumberOfDependencies(numeric_parameter); case EnumGetNumberOfLocalTests: return GetNumberOfLocalTests(numeric_parameter); case EnumGetNthDependency: return EvilUnitGetNthDependency(address, numeric_parameter, module_parameter); case EnumRunAllTests: return RunAllTests(module_parameter); default: assert(false); } } else { rc = EvilUnit_traverse_next_route(address,depth,&next_route); if (rc) {return rc;}
 #define DEPENDS(X) if (next_route == local_number) { return MAKETEST_CONCAT(EvilUnitTraverse_,X)(address,depth+1,function_to_call,numeric_parameter,module_parameter); } local_number++;
 #define DEPEND_EPILOG() (void)local_number; } return 1; }
-#define METHOD_PROLOG() static struct EvilUnitTestResult null_function_11(void) {
-#define TEST_BLOCK_HEADER(X,Y) if (0)
-#define METHOD_EPILOG() return FAIL("Called null_function_11"); }
+#define METHOD_PROLOG() static struct EvilUnitTestResult call_test_by_number(size_t test_number) { size_t local_number = 0; (void)local_number;
+#define TEST_BLOCK_HEADER(X,Y) if (test_number == local_number) { return GENTESTNAME(X,Y)(); } local_number++; if (0)
+#define METHOD_EPILOG() return FAIL("Could not call test number %li",(long)test_number);}
 #define EVILUNIT_EQUIVALENT_INCLUDE_MANGLE_TESTS_HERE
 #include "EvilUnit.h"
 #ifndef MACROLEVEL
@@ -1702,8 +1361,6 @@ static void silence_compiler(void)
 {
   EvilUnit_Disguise_setup_teardown();
   (void)LOCALMODULENAME;
-  (void)null_function_10();
-  (void)null_function_11();
   return;
 }
 /* Graph traversal wrapper functions */
