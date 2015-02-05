@@ -288,25 +288,16 @@ static void EvilUnit_Disguise_setup_teardown(void)
 #error "Need to define one of GENERATE_TEST_FUNCTIONS or GENERATE_SINGLE_FUNCTION";
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
-#define FINALISE_TEST_RUN() }} OPTIONAL_USER_TEARDOWN_LABEL() if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
+#define FINALISE_TEST_RUN() }} EvilUnit_Phase = UNITTEST_TEARDOWN; if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_SINGLE_FUNCTION)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() SETUP();
-#define FINALISE_TEST_RUN() OPTIONAL_USER_TEARDOWN_LABEL() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
-#endif
-/* There is currently no setup label as nothing needs to jump to there */
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define OPTIONAL_USER_TEARDOWN_LABEL() EvilUnit_Phase = UNITTEST_TEARDOWN;
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define OPTIONAL_USER_TEARDOWN_LABEL()
-#define OPTIONAL_USER_SETUP_LABEL()
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK SETUP();
+#define FINALISE_TEST_RUN() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
 #if (MACROLEVEL > 2)
-#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
+#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; EVILUNIT_LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
 #define EvilUnit_TEARDOWN_BLOCK }} EvilUnit_Phase = FRAMEWORK_FINAL_RETURN; EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); if (EvilUnit_ctrl.do_fixture_teardown) { return FAKE(""); } RETURNVALUE = FAIL("FrameworkError"); return FAKE("");
 #endif
 #endif
@@ -322,7 +313,7 @@ static void EvilUnit_Disguise_setup_teardown(void)
 #define EvilUnit_FINAL_RETURN EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); return FAKE("")
 #endif
 #if (MACROLEVEL > 4)
-#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
+#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto EVILUNIT_LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
 #endif
 #endif
 DEPEND_PROLOG()
@@ -475,25 +466,16 @@ int MAKETEST_CONCAT(EvilUnitTraverse_,MODULE)(struct EvilUnitAddress * address, 
 #error "Need to define one of GENERATE_TEST_FUNCTIONS or GENERATE_SINGLE_FUNCTION";
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
-#define FINALISE_TEST_RUN() }} OPTIONAL_USER_TEARDOWN_LABEL() if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
+#define FINALISE_TEST_RUN() }} EvilUnit_Phase = UNITTEST_TEARDOWN; if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_SINGLE_FUNCTION)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() SETUP();
-#define FINALISE_TEST_RUN() OPTIONAL_USER_TEARDOWN_LABEL() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
-#endif
-/* There is currently no setup label as nothing needs to jump to there */
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define OPTIONAL_USER_TEARDOWN_LABEL() EvilUnit_Phase = UNITTEST_TEARDOWN;
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define OPTIONAL_USER_TEARDOWN_LABEL()
-#define OPTIONAL_USER_SETUP_LABEL()
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK SETUP();
+#define FINALISE_TEST_RUN() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
 #if (MACROLEVEL > 2)
-#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
+#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; EVILUNIT_LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
 #define EvilUnit_TEARDOWN_BLOCK }} EvilUnit_Phase = FRAMEWORK_FINAL_RETURN; EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); if (EvilUnit_ctrl.do_fixture_teardown) { return FAKE(""); } RETURNVALUE = FAIL("FrameworkError"); return FAKE("");
 #endif
 #endif
@@ -509,7 +491,7 @@ int MAKETEST_CONCAT(EvilUnitTraverse_,MODULE)(struct EvilUnitAddress * address, 
 #define EvilUnit_FINAL_RETURN EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); return FAKE("")
 #endif
 #if (MACROLEVEL > 4)
-#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
+#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto EVILUNIT_LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
 #endif
 #endif
 DEPEND_PROLOG()
@@ -646,25 +628,16 @@ METHOD_EPILOG()
 #error "Need to define one of GENERATE_TEST_FUNCTIONS or GENERATE_SINGLE_FUNCTION";
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
-#define FINALISE_TEST_RUN() }} OPTIONAL_USER_TEARDOWN_LABEL() if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
+#define FINALISE_TEST_RUN() }} EvilUnit_Phase = UNITTEST_TEARDOWN; if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_SINGLE_FUNCTION)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() SETUP();
-#define FINALISE_TEST_RUN() OPTIONAL_USER_TEARDOWN_LABEL() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
-#endif
-/* There is currently no setup label as nothing needs to jump to there */
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define OPTIONAL_USER_TEARDOWN_LABEL() EvilUnit_Phase = UNITTEST_TEARDOWN;
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define OPTIONAL_USER_TEARDOWN_LABEL()
-#define OPTIONAL_USER_SETUP_LABEL()
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK SETUP();
+#define FINALISE_TEST_RUN() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
 #if (MACROLEVEL > 2)
-#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
+#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; EVILUNIT_LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
 #define EvilUnit_TEARDOWN_BLOCK }} EvilUnit_Phase = FRAMEWORK_FINAL_RETURN; EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); if (EvilUnit_ctrl.do_fixture_teardown) { return FAKE(""); } RETURNVALUE = FAIL("FrameworkError"); return FAKE("");
 #endif
 #endif
@@ -680,7 +653,7 @@ METHOD_EPILOG()
 #define EvilUnit_FINAL_RETURN EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); return FAKE("")
 #endif
 #if (MACROLEVEL > 4)
-#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
+#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto EVILUNIT_LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
 #endif
 #endif
 DEPEND_PROLOG()
@@ -813,25 +786,16 @@ METHOD_EPILOG()
 #error "Need to define one of GENERATE_TEST_FUNCTIONS or GENERATE_SINGLE_FUNCTION";
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
-#define FINALISE_TEST_RUN() }} OPTIONAL_USER_TEARDOWN_LABEL() if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
+#define FINALISE_TEST_RUN() }} EvilUnit_Phase = UNITTEST_TEARDOWN; if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_SINGLE_FUNCTION)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() SETUP();
-#define FINALISE_TEST_RUN() OPTIONAL_USER_TEARDOWN_LABEL() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
-#endif
-/* There is currently no setup label as nothing needs to jump to there */
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define OPTIONAL_USER_TEARDOWN_LABEL() EvilUnit_Phase = UNITTEST_TEARDOWN;
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define OPTIONAL_USER_TEARDOWN_LABEL()
-#define OPTIONAL_USER_SETUP_LABEL()
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK SETUP();
+#define FINALISE_TEST_RUN() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
 #if (MACROLEVEL > 2)
-#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
+#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; EVILUNIT_LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
 #define EvilUnit_TEARDOWN_BLOCK }} EvilUnit_Phase = FRAMEWORK_FINAL_RETURN; EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); if (EvilUnit_ctrl.do_fixture_teardown) { return FAKE(""); } RETURNVALUE = FAIL("FrameworkError"); return FAKE("");
 #endif
 #endif
@@ -847,7 +811,7 @@ METHOD_EPILOG()
 #define EvilUnit_FINAL_RETURN EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); return FAKE("")
 #endif
 #if (MACROLEVEL > 4)
-#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
+#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto EVILUNIT_LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
 #endif
 #endif
 DEPEND_PROLOG()
@@ -983,25 +947,16 @@ METHOD_EPILOG()
 #error "Need to define one of GENERATE_TEST_FUNCTIONS or GENERATE_SINGLE_FUNCTION";
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
-#define FINALISE_TEST_RUN() }} OPTIONAL_USER_TEARDOWN_LABEL() if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { char LOCALTESTNAME[] = MAKETEST_QUOTE(X); EvilUnit_STARTUP_BLOCK if (EvilUnit_ctrl.do_setup) { SETUP();{ EvilUnit_Phase = UNITTEST_CODE; if (EvilUnit_ctrl.do_test) {
+#define FINALISE_TEST_RUN() }} EvilUnit_Phase = UNITTEST_TEARDOWN; if (EvilUnit_ctrl.do_teardown) { TEARDOWN(); } EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_SINGLE_FUNCTION)
-#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK OPTIONAL_USER_SETUP_LABEL() SETUP();
-#define FINALISE_TEST_RUN() OPTIONAL_USER_TEARDOWN_LABEL() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
-#endif
-/* There is currently no setup label as nothing needs to jump to there */
-#if defined(GENERATE_TEST_FUNCTIONS)
-#define OPTIONAL_USER_TEARDOWN_LABEL() EvilUnit_Phase = UNITTEST_TEARDOWN;
-#define OPTIONAL_USER_SETUP_LABEL()
-#endif
-#if defined(GENERATE_SINGLE_FUNCTION)
-#define OPTIONAL_USER_TEARDOWN_LABEL()
-#define OPTIONAL_USER_SETUP_LABEL()
+#define SIMPLE_TEST_RUN(X,Y) TEST_BLOCK_HEADER(X,Y) { EvilUnit_STARTUP_BLOCK SETUP();
+#define FINALISE_TEST_RUN() TEARDOWN(); EvilUnit_TEARDOWN_BLOCK }
 #endif
 #if defined(GENERATE_TEST_FUNCTIONS)
 #if (MACROLEVEL > 2)
-#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
+#define EvilUnit_STARTUP_BLOCK EvilUnit_LOCAL_VARIABLES; EVILUNIT_LABEL_FRAMEWORK_BEGINNING: ; EvilUnit_Phase = UNITTEST_SETUP;{
 #define EvilUnit_TEARDOWN_BLOCK }} EvilUnit_Phase = FRAMEWORK_FINAL_RETURN; EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); if (EvilUnit_ctrl.do_fixture_teardown) { return FAKE(""); } RETURNVALUE = FAIL("FrameworkError"); return FAKE("");
 #endif
 #endif
@@ -1017,7 +972,7 @@ METHOD_EPILOG()
 #define EvilUnit_FINAL_RETURN EvilUnit_SetTestName(&RETURNVALUE,LOCALTESTNAME); return FAKE("")
 #endif
 #if (MACROLEVEL > 4)
-#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
+#define return if (RETURNFLAG = false, EvilUnit_Phase==FRAMEWORK_FINAL_RETURN) return RETURNVALUE; else while(1) if (RETURNFLAG = !RETURNFLAG, !RETURNFLAG) { EvilUnit_ctrl = EvilUnit_Control_Update(EvilUnit_Phase); goto EVILUNIT_LABEL_FRAMEWORK_BEGINNING; } else RETURNVALUE =
 #endif
 #endif
 DEPEND_PROLOG()
