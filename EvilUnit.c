@@ -14,6 +14,9 @@
  * You should have received a copy of the GNU Lesser General Public License along 
  * with EvilUnit. If not, see <http://www.gnu.org/licenses/>.
  */
+/*
+ * Copyright 2015 Jon Chesterfield. All rights reserved.
+ */
 #if defined(PRECOMPILATION)
 #define EVILUNIT_TEST_FRAMEWORK_HEADER
 #define EVILUNIT_TMPINCLUDE #include "EvilUnit.h"
