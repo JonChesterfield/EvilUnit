@@ -94,7 +94,7 @@ static MODULE(strings_null_pointers)
     }
 }
 
-static MODULE(evilunit_string_equal)
+MODULE(evilunit_string_equal)
 {
   DEPENDS(strings_simple_examples);
   DEPENDS(strings_null_pointers);

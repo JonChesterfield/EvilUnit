@@ -636,6 +636,7 @@ int evilunit(void (*root) (int, void *, const char ** name, unsigned int *))
 }
 
 /* Helper functions for included test modules */
+static EVILUNIT_MODULE_DECLARE(evilunit_string_equal);
 #include "evilunit_string_equal.i"
 static int evilunit_test_states_match(struct evilunit_test_state * lhs, struct evilunit_test_state * rhs)
 {
