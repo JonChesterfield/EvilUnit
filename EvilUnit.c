@@ -635,9 +635,9 @@ int evilunit(void (*root) (int, void *, const char ** name, unsigned int *))
   return result.number_failure;
 }
 
+#include "evilunit_string_equal.i"
 
 /* Test files are out of line for convenience only */
-
 #include "evilunit_selftest_implementation_check.i"
 #include "evilunit_selftest_counting_dependencies.i"
 #include "evilunit_selftest_get_module_name.i"
