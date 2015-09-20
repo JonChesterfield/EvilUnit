@@ -9,10 +9,10 @@ This is considered alpha quality, in that I've been using it for about a year. I
 The purpose is to minimise the boilerplate involved in writing unit tests in the lowest common demoninator of programming languages. The design goals and constraints may be considered eccentric, in which case I'd recommend the excellent Catch project (URL).
 
 To use
-1. Compile EvilUnit.c
-2. Include EvilUnit.h
-3. Read and imitate evilunit_selftest_main.c to create a main() function
-4. Link everything and run
+* Compile EvilUnit.c
+* Include EvilUnit.h
+* Read and imitate evilunit_selftest_main.c to create a main() function
+* Link everything and run
 
 Features
 * Adding a test case does not require manual registration
