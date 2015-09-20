@@ -1,5 +1,4 @@
 #include "EvilUnit.h"
-#include "evilunit_selftest.h"
 
 static MODULE(set_of_unary_tests)
 {
@@ -43,7 +42,7 @@ static MODULE(evilunit_selftest_run_specific_test)
       expect.testname_string = "set_of_unary_tests";
       test_to_run = 0;
       answer = evilunit_execute_specific_test(unary,test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("Can call the first test explicitly")
@@ -53,7 +52,7 @@ static MODULE(evilunit_selftest_run_specific_test)
       expect.testname_string = "test one";
       test_to_run = 1;
       answer = evilunit_execute_specific_test(unary,test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("Can call the second test explicitly")
@@ -63,7 +62,7 @@ static MODULE(evilunit_selftest_run_specific_test)
       expect.testname_string = "test two";
       test_to_run = 2;
       answer = evilunit_execute_specific_test(unary,test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("Can call the third test explicitly")
@@ -73,7 +72,7 @@ static MODULE(evilunit_selftest_run_specific_test)
       expect.testname_string = "test three";
       test_to_run = 3;
       answer = evilunit_execute_specific_test(unary,test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("Calling a test that does not exist (when there are also no checks) returns pass and an empty string")
@@ -83,6 +82,6 @@ static MODULE(evilunit_selftest_run_specific_test)
       expect.testname_string = "call_a_test_that_does_not_exist";
       test_to_run = 2;
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(call_a_test_that_does_not_exist),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 }

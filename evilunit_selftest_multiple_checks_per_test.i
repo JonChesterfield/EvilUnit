@@ -1,5 +1,4 @@
 #include "EvilUnit.h"
-#include "evilunit_selftest.h"
 
 static MODULE(multiple_checks)
 {
@@ -157,5 +156,5 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
   }
 
   answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(multiple_checks),test_to_run);
-  CHECK(test_states_match(&expect,&answer));
+  CHECK(evilunit_test_states_match(&expect,&answer));
 }

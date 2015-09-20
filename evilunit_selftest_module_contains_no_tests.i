@@ -1,5 +1,4 @@
 #include "EvilUnit.h"
-#include "evilunit_selftest.h"
 
 static MODULE(set_containing_no_checks)
 {
@@ -64,7 +63,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.result = evilunit_test_pass();
       expect.testname_string = "set_containing_no_checks";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_no_checks),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("module with passing check returns pass and the checked string")
@@ -73,7 +72,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42==42";
       expect.testname_string = "set_containing_passing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_passing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("module with failing check returns fail and the checked string")
@@ -82,7 +81,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42!=42";
       expect.testname_string = "set_containing_failing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_failing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("module with a passing then a failing test fails with the failed string")
@@ -91,7 +90,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42!=42";
       expect.testname_string = "set_containing_passing_then_failing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_passing_then_failing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("module with a failing then a passing test fails with the failed string")
@@ -100,7 +99,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42!=42";
       expect.testname_string = "set_containing_failing_then_passing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_failing_then_passing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("multiple passing checks, last wins")
@@ -109,7 +108,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42==42";
       expect.testname_string = "set_containing_passing_then_passing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_passing_then_passing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("multiple failing checks, first wins")
@@ -118,7 +117,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42!=42";
       expect.testname_string = "set_containing_failing_then_failing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_failing_then_failing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("module with {pass/fail/pass} tests fails with the failed string")
@@ -127,7 +126,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42!=42";
       expect.testname_string = "set_containing_passing_then_failing_then_passing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_passing_then_failing_then_passing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
   TEST("module with {fail/pass/fail} first fail wins")
@@ -136,7 +135,7 @@ static MODULE(evilunit_selftest_module_contains_no_tests)
       expect.check_string = "42!=42";
       expect.testname_string = "set_containing_failing_then_passing_then_failing_check";
       answer = evilunit_execute_specific_test(EVILUNIT_MODULE_MANGLE(set_containing_failing_then_passing_then_failing_check),test_to_run);
-      CHECK(test_states_match(&expect,&answer));
+      CHECK(evilunit_test_states_match(&expect,&answer));
     }
 
 }

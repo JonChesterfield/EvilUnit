@@ -635,7 +635,15 @@ int evilunit(void (*root) (int, void *, const char ** name, unsigned int *))
   return result.number_failure;
 }
 
+/* Helper functions for included test modules */
 #include "evilunit_string_equal.i"
+static int evilunit_test_states_match(struct evilunit_test_state * lhs, struct evilunit_test_state * rhs)
+{
+  /* Ignoring line field as it's likely to be a pain to maintain */
+  return ((lhs->result == rhs->result) &&
+          (evilunit_string_equal(lhs->check_string,rhs->check_string)) &&
+	  (evilunit_string_equal(lhs->testname_string,rhs->testname_string)));
+}
 
 /* Test files are out of line for convenience only */
 #include "evilunit_selftest_implementation_check.i"

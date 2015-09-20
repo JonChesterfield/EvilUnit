@@ -16,9 +16,7 @@ OBJ=$(SRC:%.c=%.o) EvilUnit.o
 
 CXXOBJ=$(SRC:%.c=%.cxx.o) EvilUnit.cxx.o
 
-CSTLINCL = -I../cstl -I../cstl/datastructure -I../cstl/local_include -I../cstl/memory -I../cstl/functions -I../cstl/primitive
-
-PRECOMPILER = clang -std=c89 -E -C -P -DPRECOMPILATION  $(CSTLINCL)
+PRECOMPILER = clang -std=c89 -E -C -P -DPRECOMPILATION
 
 all:	$(TEST) $(CXXTEST) EvilUnit.pre.h EvilUnit.pre.c
 	./$(TEST)
@@ -31,10 +29,10 @@ EvilUnit.pre.h:	EvilUnit.h
 EvilUnit.pre.c:	EvilUnit.c
 	$(PRECOMPILER) $< -o $@
 
-%.o:	%.c EvilUnit.h evilunit_selftest.h
+%.o:	%.c EvilUnit.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%.cxx.o:	%.c EvilUnit.h evilunit_selftest.h
+%.cxx.o:	%.c EvilUnit.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(CXXTEST):	$(CXXOBJ)
