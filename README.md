@@ -8,7 +8,7 @@ This is considered alpha quality, in that I've been using it for about a year. I
 
 The purpose is to minimise the boilerplate involved in writing unit tests in the lowest common demoninator of programming languages. The design goals and constraints may be considered eccentric, in which case I'd recommend the excellent Catch project (URL).
 
-To use:
+To use
 1. Compile EvilUnit.c
 2. Include EvilUnit.h
 3. Read and imitate evilunit_selftest_main.c to create a main() function
@@ -23,7 +23,7 @@ Features
 * No dynamic memory allocation
 * Works without standard libraries (slightly better with stdio)
 
-The interface is the set of macros defined in EvilUnit.h which provide the following:
+The interface is the set of macros defined in EvilUnit.h which provide the following
 ```
 MODULE(X){} // Names some unit of functionality. Contains the other constructs.
 DEPENDS(X)  // This module depend on functionality tested by module X
@@ -31,7 +31,7 @@ TEST(X){}   // Names an individual unit test. Can contain CHECK().
 CHECK(X)    // Takes an integer boolean. Failure if it evaluates as false.
 ```
 
-Example:
+Example
 ```
 #include "EvilUnit.h"
 MODULE(demo)
