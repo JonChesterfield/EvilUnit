@@ -15,6 +15,7 @@
  * with EvilUnit. If not, see <http://www.gnu.org/licenses/>.
  */
 #if defined(PRECOMPILATION)
+#define EVILUNIT_TEST_FRAMEWORK_HEADER
 #define EVILUNIT_TMPINCLUDE #include "EvilUnit.h"
 EVILUNIT_TMPINCLUDE
 #undef EVILUNIT_TMPINCLUDE
