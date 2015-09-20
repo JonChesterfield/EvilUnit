@@ -4,7 +4,7 @@ Copyright 2015 Jon Chesterfield. All rights reserved.
 
 This library is licensed under the LGPL v3, see LICENSE. The source files should all have an appropriate header to this effect, but where this is missing the intention is still for the code to be under the LGPL v3.
 
-This is considered alpha quality, in that I've been using it for about a year. It's on github seeking a second or even third user - feedback is welcome, especially on changes to the API. I should write better docs at some point.
+This is considered alpha quality, in that I've been using it for about a year. It's on github seeking a second or even third user - feedback is welcome, especially on changes to the API. I should write better docs at some point, until then the various .i files contain examples of the self test code. evilunit_string_equal.i is a good self contained example. evilunit_selftest.c may also be worth reading as an example of where to find main().
 
 The purpose is to minimise the boilerplate involved in writing unit tests in the lowest common demoninator of programming languages. The design goals and constraints may be considered eccentric, in which case I'd recommend the excellent Catch project (URL).
 
