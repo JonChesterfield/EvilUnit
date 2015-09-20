@@ -9,19 +9,19 @@ This is considered alpha quality, in that I've been using it for about a year. I
 The purpose is to minimise the boilerplate involved in writing unit tests in the lowest common demoninator of programming languages. The design goals and constraints may be considered eccentric, in which case I'd recommend the excellent Catch project (URL).
 
 To use:
-Compile EvilUnit.c
-Include EvilUnit.h
-Read and imitate evilunit_selftest_main.c to create a main() function
-Link everything and run
+1. Compile EvilUnit.c
+2. Include EvilUnit.h
+3. Read and imitate evilunit_selftest_main.c to create a main() function
+4. Link everything and run
 
 Features
-Adding a test case does not require manual registration
-Dependencies between tests are written with the tests themselves
-Common setup/teardown code is easily shared between tests
-Useful for testing static functions
-Implemented in the common subset of C and C++
-No dynamic memory allocation
-Works with no standard libraries
+* Adding a test case does not require manual registration
+* Dependencies between tests are written with the tests themselves
+* Common setup/teardown code is easily shared between tests
+* Useful for testing static functions
+* Implemented in the common subset of C and C++
+* No dynamic memory allocation
+* Works without standard libraries (slightly better with stdio)
 
 The interface is the set of macros defined in EvilUnit.h which provide the following:
 ```
@@ -52,7 +52,7 @@ MODULE(demo)
 ```
 
 Known limitations
-The console printing is quite crude as I tend to view failing tests in a debugger. This will probably improve later.
-The graph walking code is not thread safe.
-Setting up the driver using MAIN_MODULE() is crude.
-Linking tests in C with tests in C++ doesn't work (haven't yet set up the name mangling appropriately). 
+* The console printing is quite crude as I tend to view failing tests in a debugger. This will probably improve later.
+* The graph walking code is not thread safe.
+* Setting up the driver using MAIN_MODULE() is crude.
+* Linking tests in C with tests in C++ doesn't work (haven't yet set up the name mangling appropriately).
