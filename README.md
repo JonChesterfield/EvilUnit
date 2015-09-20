@@ -24,12 +24,15 @@ No dynamic memory allocation
 Works with no standard libraries
 
 The interface is the set of macros defined in EvilUnit.h which provide the following:
+```
 MODULE(X){} // Names some unit of functionality. Contains the other constructs.
 DEPENDS(X)  // This module depend on functionality tested by module X
 TEST(X){}   // Names an individual unit test. Can contain CHECK().
 CHECK(X)    // Takes an integer boolean. Failure if it evaluates as false.
+```
 
 Example:
+```
 #include "EvilUnit.h"
 MODULE(demo)
 {
@@ -46,6 +49,7 @@ MODULE(demo)
       CHECK(four == 5);
     }
 }
+```
 
 Known limitations
 The console printing is quite crude as I tend to view failing tests in a debugger. This will probably improve later.
