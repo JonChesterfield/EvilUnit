@@ -20,10 +20,17 @@ static MODULE(indirect_first)
   CHECK(1!=42);
 }
 
-MODULE(evilunit_selftest_recursive)
+static MODULE(evilunit_selftest_recursive)
 {
   CHECK(1!=2);
   DEPENDS(direct);
   DEPENDS(indirect_first);
   DEPENDS(indirect_second);
+}
+
+
+MAIN_MODULE()
+{
+  DEPENDS(evilunit_selftest);
+  DEPENDS(evilunit_selftest_recursive);
 }

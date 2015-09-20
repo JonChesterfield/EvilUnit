@@ -35,10 +35,10 @@ EvilUnit.pre.c:	EvilUnit.c
 %.cxx.o:	%.c EvilUnit.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(CXXTEST):	$(CXXOBJ)
+$(CXXTEST):	$(CXXOBJ) evilunit_selftest.cxx.o
 	$(LDCXX) $(CXXFLAGS) $^ -o $@
 
-$(TEST):	$(OBJ)
+$(TEST):	$(OBJ) evilunit_selftest.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
