@@ -21,7 +21,7 @@
 
 static MODULE(fake_module)
 {
-  (void)state;
+  (void)evilunit_internal_state;
 }
 
 static MODULE(evilunit_selftest_implementation_check)

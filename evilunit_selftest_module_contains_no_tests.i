@@ -21,7 +21,7 @@
 
 static MODULE(set_containing_no_checks)
 {
-  (void)state;
+  (void)evilunit_internal_state;
 }
 
 static MODULE(set_containing_passing_check)

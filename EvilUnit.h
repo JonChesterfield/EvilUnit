@@ -88,13 +88,13 @@
  */
 #endif
 
-#define EVILUNIT_CHECK(X) evilunit_implementation_check(state,(X),__LINE__,#X);
+#define EVILUNIT_CHECK(X) evilunit_implementation_check(evilunit_internal_state,(X),__LINE__,#X);
 
-#define EVILUNIT_TEST(blockname) if (evilunit_implementation_test(state,blockname))
+#define EVILUNIT_TEST(blockname) if (evilunit_implementation_test(evilunit_internal_state,blockname))
 
 #define EVILUNIT_DEPENDS(X)                                             \
   {EVILUNIT_MODULE_DECLARE(X);                                          \
-    evilunit_implementation_depends(state, &(EVILUNIT_MODULE_MANGLE(X)));}
+    evilunit_implementation_depends(evilunit_internal_state, &(EVILUNIT_MODULE_MANGLE(X)));}
 #if 0
 /*
  * MODULE expands to a function containing a union used to avoid exposing
@@ -111,7 +111,7 @@
   EVILUNIT_MODULE_DECLARE(MODNAME);                                     \
   EVILUNIT_EXTERNAL                                                     \
   static void EVILUNIT_CONCAT(module_,MODNAME)                          \
-       (struct evilunit_module_state * state);                          \
+       (struct evilunit_module_state * evilunit_internal_state);	\
        EVILUNIT_MODULE_DECLARE(MODNAME)                                 \
   {                                                                     \
     struct evilunit_module_state * state =                              \
@@ -178,7 +178,7 @@
         }                                                               \
       }                                                                 \
   }                                                                     \
-       void EVILUNIT_CONCAT(module_,MODNAME)(struct evilunit_module_state * state)
+       void EVILUNIT_CONCAT(module_,MODNAME)(struct evilunit_module_state * evilunit_internal_state)
 
 
 #ifdef _cplusplus

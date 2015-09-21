@@ -21,7 +21,7 @@
 
 static MODULE(uninteresting_module)
 {
-  (void)state;
+  (void)evilunit_internal_state;
 }
 
 static MODULE(get_module_name_from_function)

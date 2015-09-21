@@ -21,7 +21,7 @@
 
 static MODULE(count_empty_target)
 {
-  (void)state;
+  (void)evilunit_internal_state;
 }
 
 static MODULE(count_checks_passing_target)
