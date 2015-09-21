@@ -62,11 +62,11 @@ EVILUNIT_TMPINCLUDE
 
 struct evilunit_test_state
 {
-  int result;
-  int line;
   const char * check_string; /* e.g. "oh no!" */
   const char * testname_string; /* e.g. "foobar" */
   const char * module_string; /* e.g. "my_module" */
+  int result;
+  int line;
   int number_failure;
   int number_success;
 };
@@ -193,11 +193,11 @@ void evilunit_implementation_check(struct evilunit_module_state * S,
 static struct evilunit_test_state make_test_state(const char * module_name)
 {
   struct evilunit_test_state retval;
-  retval.result = evilunit_test_init();
-  retval.line = 0;
   retval.check_string = "";
   retval.testname_string = module_name;
   retval.module_string = module_name;
+  retval.result = evilunit_test_init();
+  retval.line = 0;
   retval.number_failure = 0;
   retval.number_success = 0;
   return retval;
