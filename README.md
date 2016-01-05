@@ -11,7 +11,7 @@ The purpose is to minimise the boilerplate involved in writing unit tests in the
 To use
 * Compile EvilUnit.c
 * Include EvilUnit.h
-* Any module you define has signature int (*)(int, char**) so is a valid entry point
+* Any module you define has signature `int (*)(int, char**)` so is a valid entry point
 * Link everything and run
 
 Features
