@@ -73,11 +73,8 @@ struct evilunit_test_state
 
 
 struct evilunit_module_state;
-typedef void (*evilunit_node_type)(int instruction,
-                                     void * state,
-                                     const char ** name,
-                                     unsigned int * number);
-
+typedef int (*evilunit_node_type)(int instruction,
+                                  char ** state);
 
 enum evilunit_command {uninitialised = 0, how_many_tests, how_many_dependencies, run_one, get_name, get_dependency};
 struct evilunit_module_state
@@ -87,7 +84,7 @@ struct evilunit_module_state
   unsigned int test_counter; /* count some tests */
   unsigned int dependency_counter; /* count some dependencies */
   unsigned int numeric_parameter; /* reused for various things */
-  const char * active_test_name;
+  const char * string_parameter;
   evilunit_node_type traverse_parameter;
 };
 
@@ -124,20 +121,20 @@ int evilunit_implementation_test(struct evilunit_module_state * state, const cha
   if (state->Q == run_one)
     {
       if (is_matching_test_number(state))
-	{
-	  state->active_test_name = blockname;
-	  state->test.testname_string = blockname;
-	}
+        {
+          state->string_parameter = blockname;
+          state->test.testname_string = blockname;
+        }
       return is_matching_test_number(state);
     }
 
   if (state->Q == get_name)
     {
       if (is_matching_test_number(state))
-	{
-	  state->active_test_name = blockname;
-	  state->test.testname_string = blockname;
-	}
+        {
+          state->string_parameter = blockname;
+          state->test.testname_string = blockname;
+        }
     }
 
   return 0;
@@ -156,14 +153,14 @@ void evilunit_implementation_depends(struct evilunit_module_state * state, evilu
     }
 }
 void evilunit_implementation_check(struct evilunit_module_state * S,
-                                     int check_resolved_to_this,
-                                     int line,
-                                     const char * check_string);
+                                   int check_resolved_to_this,
+                                   int line,
+                                   const char * check_string);
 
 void evilunit_implementation_check(struct evilunit_module_state * S,
-                                     int check_resolved_to_this,
-                                     int line,
-                                     const char * check_string)
+                                   int check_resolved_to_this,
+                                   int line,
+                                   const char * check_string)
 {
   struct evilunit_test_state * ongoing = &(S->test);
 
@@ -184,7 +181,21 @@ void evilunit_implementation_check(struct evilunit_module_state * S,
   ongoing->result = (check_resolved_to_this) ? evilunit_test_pass() : evilunit_test_fail();
   ongoing->line = line;
   ongoing->check_string = check_string;
-  ongoing->testname_string = S->active_test_name;
+  ongoing->testname_string = S->string_parameter;
+  return;
+}
+
+void evilunit_implementation_set_string_parameter(struct evilunit_module_state * S, const char * str);
+void evilunit_implementation_set_string_parameter(struct evilunit_module_state * S, const char * str)
+{
+  S->string_parameter = str;
+  return;
+}
+
+void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num);
+void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num)
+{
+  S->numeric_parameter = num;
   return;
 }
 
@@ -251,7 +262,7 @@ static void clear_module_state(evilunit_node_type node, struct evilunit_module_s
   module->test_counter = 0;
   module->dependency_counter = 0;
   module->numeric_parameter = 0;
-  module->active_test_name = module_name;
+  module->string_parameter = module_name;
   module->traverse_parameter = node;
 }
 
@@ -297,45 +308,37 @@ static struct evilunit_module_state * require_dependency(struct evilunit_module_
 
 static void evilunit_call_state_only(evilunit_node_type node, int instruction, struct evilunit_module_state * S)
 {
-  const char * name = "";
-  unsigned int number = 0;
-  node(instruction,S,&name,&number);
+  (void)node(instruction,EVILUNIT_CAST(char**,S));
 }
 
 static const char * evilunit_query_module_name(evilunit_node_type node)
 {
   int instruction = evilunit_traverse_command_get_module_name;
   struct evilunit_module_state S;
-  const char * name = "";
-  unsigned int number = 0;
-  node(instruction,&S,&name,&number);
-  return name;
+  (void)node(instruction,EVILUNIT_CAST(char**,(&S)));
+  return S.string_parameter;
 }
 
 static const char * evilunit_query_module_filename(evilunit_node_type node)
 {
   int instruction = evilunit_traverse_command_get_module_filename;
   struct evilunit_module_state S;
-  const char * name = "";
-  unsigned int number = 0;
-  node(instruction,&S,&name,&number);
-  return name;
+  (void)node(instruction,EVILUNIT_CAST(char**,(&S)));
+  return S.string_parameter;
 }
 
 static const char * evilunit_query_test_name(evilunit_node_type node, unsigned int test)
 {
   int instruction = evilunit_traverse_command_get_test_name_from_number;
   struct evilunit_module_state S;
-  const char * name = "";
-  unsigned int number = 0;
   if (test == 0)
     {
       return evilunit_query_module_name(node);
     }
   (void)require_test_name(&S,node,test);
   S.numeric_parameter = test;
-  node(instruction,&S,&name,&number);
-  return S.active_test_name;
+  (void)node(instruction,EVILUNIT_CAST(char**,(&S)));
+  return S.string_parameter;
 }
 
 static evilunit_node_type evilunit_query_dependency(evilunit_node_type node, unsigned int dependency)
@@ -421,20 +424,16 @@ static int evilunit_query_is_white(evilunit_node_type node)
 {
   int instruction = evilunit_traverse_command_is_colour_white;
   struct evilunit_module_state S;
-  const char * name = "";
-  unsigned int number = 0;
-  node(instruction,&S,&name,&number);
-  return number == 1;
+  (void)node(instruction,EVILUNIT_CAST(char**,(&S)));
+  return S.numeric_parameter == 1;
 }
 
 static int evilunit_query_is_grey(evilunit_node_type node)
 {
   int instruction = evilunit_traverse_command_is_colour_grey;
   struct evilunit_module_state S;
-  const char * name = "";
-  unsigned int number = 0;
-  node(instruction,&S,&name,&number);
-  return number == 1;
+  (void)node(instruction,EVILUNIT_CAST(char**,(&S)));
+  return S.numeric_parameter == 1;
 }
 
 /* Typedefs for the graph walk functions */
@@ -626,11 +625,9 @@ static void graph_collapse(evilunit_node_type root)
   evilunit_store_result(root,res);
 }
 
-
-
 /* Prototype is chosen to fit easily into main() */
-int evilunit(void (*root) (int, void *, const char ** name, unsigned int *));
-int evilunit(void (*root) (int, void *, const char ** name, unsigned int *))
+int evilunit_implementation(evilunit_node_type root);
+int evilunit_implementation(evilunit_node_type root)
 {
   struct evilunit_test_state result = evilunit_execute_everything(root);
   graph_collapse(root);
@@ -646,7 +643,7 @@ static int evilunit_test_states_match(struct evilunit_test_state * lhs, struct e
   /* Ignoring line field as it's likely to be a pain to maintain */
   return ((lhs->result == rhs->result) &&
           (evilunit_string_equal(lhs->check_string,rhs->check_string)) &&
-	  (evilunit_string_equal(lhs->testname_string,rhs->testname_string)));
+          (evilunit_string_equal(lhs->testname_string,rhs->testname_string)));
 }
 
 /* Test files are out of line for convenience only */
@@ -659,6 +656,7 @@ static int evilunit_test_states_match(struct evilunit_test_state * lhs, struct e
 #include "evilunit_selftest_number_recording.i"
 #include "evilunit_selftest_run_specific_test.i"
 #include "evilunit_selftest_counting_tests.i"
+#include "evilunit_selftest_macros_for_names.i"
 
 MODULE(evilunit_selftest)
 {
@@ -671,5 +669,6 @@ MODULE(evilunit_selftest)
   DEPENDS(evilunit_selftest_number_recording);
   DEPENDS(evilunit_selftest_run_specific_test);
   DEPENDS(evilunit_selftest_counting_tests);
+  DEPENDS(evilunit_selftest_macros_for_names);
   DEPENDS(evilunit_selftest); /* Recursive sanity check */
 }

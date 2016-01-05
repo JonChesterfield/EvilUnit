@@ -39,20 +39,22 @@
 
 #if 0
 /* This kind of sucks. Perhaps an enum would still be better. */
+/* Execute all tests is keyed to 1 as that's the default for argc */
 #endif
+#define evilunit_traverse_command_execute_all_tests (1)
 #define evilunit_traverse_command_get_number_of_tests (0)
-#define evilunit_traverse_command_get_number_of_dependencies (1)
-#define evilunit_traverse_command_get_test_name_from_number (2)
-#define evilunit_traverse_command_get_dependency_from_number (3)
-#define evilunit_traverse_command_run_specific_test (4)
-#define evilunit_traverse_command_get_module_name (5)
-#define evilunit_traverse_command_get_module_filename (6)
-#define evilunit_traverse_command_store_result (7)
-#define evilunit_traverse_command_retrieve_result (8)
-#define evilunit_traverse_command_mark_colour_white (9)
-#define evilunit_traverse_command_mark_colour_grey (10)
-#define evilunit_traverse_command_is_colour_white (11)
-#define evilunit_traverse_command_is_colour_grey (12)
+#define evilunit_traverse_command_get_number_of_dependencies (2)
+#define evilunit_traverse_command_get_test_name_from_number (3)
+#define evilunit_traverse_command_get_dependency_from_number (4)
+#define evilunit_traverse_command_run_specific_test (5)
+#define evilunit_traverse_command_get_module_name (6)
+#define evilunit_traverse_command_get_module_filename (7)
+#define evilunit_traverse_command_store_result (8)
+#define evilunit_traverse_command_retrieve_result (9)
+#define evilunit_traverse_command_mark_colour_white (10)
+#define evilunit_traverse_command_mark_colour_grey (11)
+#define evilunit_traverse_command_is_colour_white (12)
+#define evilunit_traverse_command_is_colour_grey (13)
 
 #if 0
 /* External functions, implemented in evilunit.c */
@@ -62,9 +64,11 @@
   struct evilunit_module_state;                                         \
   void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, void * test, int direction); \
   int evilunit_implementation_test(struct evilunit_module_state * state, const char *blockname); \
-  void evilunit_implementation_depends(struct evilunit_module_state * state, void (*proposed)(int instruction, void * state, const char ** name,unsigned int * number)); \
-  void evilunit_implementation_check(struct evilunit_module_state * S, int check_resolved_to_this, int line, const char * check_string);
-
+  void evilunit_implementation_depends(struct evilunit_module_state * state, int (*proposed)(int instruction, char** state)); \
+  void evilunit_implementation_check(struct evilunit_module_state * S, int check_resolved_to_this, int line, const char * check_string); \
+  void evilunit_implementation_set_string_parameter(struct evilunit_module_state * S, const char * str); \
+  void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num);\
+int evilunit_implementation(int (*root) (int, char **));
 
 #ifdef _cplusplus
 #define EVILUNIT_EXTERNAL extern "C" { EVILUNIT_EXTERNAL_FUNCTIONS }
@@ -75,9 +79,9 @@
 #define EVILUNIT_CONCAT(a__, b__) EVILUNIT_CONCAT_DO(a__, b__)
 #define EVILUNIT_CONCAT_DO(a__, b__) a__##b__
 #define EVILUNIT_MODULE_MANGLE(MODNAME) EVILUNIT_CONCAT(evilunit_node_,MODNAME)
-#define EVILUNIT_MODULE_DECLARE(MODNAME) void EVILUNIT_MODULE_MANGLE(MODNAME)(int instruction, void * vstate, const char ** name, unsigned int * number)
+#define EVILUNIT_MODULE_DECLARE(MODNAME) int EVILUNIT_MODULE_MANGLE(MODNAME)(int instruction, char ** vstate)
 #ifdef __cplusplus
-#define EVILUNIT_CAST(TYPE,VARIABLE) static_cast<TYPE>(VARIABLE)
+#define EVILUNIT_CAST(TYPE,VARIABLE) reinterpret_cast<TYPE>(VARIABLE)
 #else
 #define EVILUNIT_CAST(TYPE,VARIABLE) (TYPE) (VARIABLE)
 #endif
@@ -111,7 +115,7 @@
   EVILUNIT_MODULE_DECLARE(MODNAME);                                     \
   EVILUNIT_EXTERNAL                                                     \
   static void EVILUNIT_CONCAT(module_,MODNAME)                          \
-       (struct evilunit_module_state * evilunit_internal_state);	\
+       (struct evilunit_module_state * evilunit_internal_state);        \
        EVILUNIT_MODULE_DECLARE(MODNAME)                                 \
   {                                                                     \
     struct evilunit_module_state * state =                              \
@@ -125,8 +129,14 @@
     } stored_test_state_storage;                                        \
     void * stored_test_state = &stored_test_state_storage;              \
     static int stored_node_colour;                                      \
+    const unsigned int white_colour = 0;                                \
+    const unsigned int grey_colour = 1;                                 \
     switch(instruction)                                                 \
       {                                                                 \
+      case evilunit_traverse_command_execute_all_tests:                 \
+        {                                                               \
+          return evilunit_implementation(EVILUNIT_MODULE_MANGLE(MODNAME));\
+        }                                                               \
       case evilunit_traverse_command_get_number_of_tests:               \
       case evilunit_traverse_command_get_number_of_dependencies:        \
       case evilunit_traverse_command_get_dependency_from_number:        \
@@ -134,70 +144,71 @@
       case evilunit_traverse_command_run_specific_test:                 \
         {                                                               \
           EVILUNIT_CONCAT(module_,MODNAME)(state);                      \
-          return;                                                       \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_get_module_name:                   \
         {                                                               \
-          *name = #MODNAME;                                             \
-          return;                                                       \
+          evilunit_implementation_set_string_parameter(state,#MODNAME); \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_get_module_filename:               \
         {                                                               \
-          *name = __FILE__;                                             \
-          return;                                                       \
+          evilunit_implementation_set_string_parameter(state,__FILE__); \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_store_result:                      \
         {                                                               \
           evilunit_implementation_manage_test_state(state,stored_test_state,0); \
-          return;                                                       \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_retrieve_result:                   \
         {                                                               \
           evilunit_implementation_manage_test_state(state,stored_test_state,1); \
-          return;                                                       \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_mark_colour_white:                 \
         {                                                               \
-          stored_node_colour = 0;                                       \
-          return;                                                       \
+          stored_node_colour = white_colour;                            \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_mark_colour_grey:                  \
         {                                                               \
-          stored_node_colour = 1;                                       \
-          return;                                                       \
+          stored_node_colour = grey_colour;                             \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_is_colour_white:                   \
         {                                                               \
-          *number = (stored_node_colour == 0) ? 1 : 0;                  \
-          return;                                                       \
+          evilunit_implementation_set_numeric_parameter                 \
+            (state,(stored_node_colour == white_colour) ? 1 : 0);       \
+          break;                                                        \
         }                                                               \
       case evilunit_traverse_command_is_colour_grey:                    \
         {                                                               \
-          *number = (stored_node_colour == 1) ? 1 : 0;                  \
-          return;                                                       \
+          evilunit_implementation_set_numeric_parameter                 \
+            (state,(stored_node_colour == grey_colour) ? 1 : 0);        \
+          break;                                                        \
         }                                                               \
       }                                                                 \
+    return 0;                                                           \
   }                                                                     \
        void EVILUNIT_CONCAT(module_,MODNAME)(struct evilunit_module_state * evilunit_internal_state)
 
 
 #ifdef _cplusplus
-#define EVILUNIT_MAIN_MODULE()                                          \
-  extern "C" {                                                          \
-    EVILUNIT_MODULE_DECLARE(main_module);                               \
-    int evilunit(void (*root) (int, struct evilunit_module_state *,const char **,unsigned int *)); \
-  }                                                                     \
-  int main(void)                                                        \
-  {                                                                     \
-    return evilunit(EVILUNIT_MODULE_MANGLE(main_module));               \
+#define EVILUNIT_MAIN_MODULE()                                  \
+  extern "C" {                                                  \
+    EVILUNIT_MODULE_DECLARE(main_module);                       \
+  }                                                             \
+  int main(void)                                                \
+  {                                                             \
+    return EVILUNIT_MODULE_MANGLE(main_module)(1,0);            \
   } MODULE(main_module)
 #else
-#define EVILUNIT_MAIN_MODULE()                                          \
-  EVILUNIT_MODULE_DECLARE(main_module);                                 \
-  int evilunit(void (*root) (int, void *,const char **,unsigned int *)); \
-  int main(void)                                                        \
-  {                                                                     \
-    return evilunit(EVILUNIT_MODULE_MANGLE(main_module));               \
+#define EVILUNIT_MAIN_MODULE()                                  \
+  EVILUNIT_MODULE_DECLARE(main_module);                         \
+  int main(void)                                                \
+  {                                                             \
+    return EVILUNIT_MODULE_MANGLE(main_module)(1,0);            \
   } MODULE(main_module)
 #endif
 
