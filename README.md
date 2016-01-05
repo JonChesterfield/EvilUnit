@@ -11,7 +11,7 @@ The purpose is to minimise the boilerplate involved in writing unit tests in the
 To use
 * Compile EvilUnit.c
 * Include EvilUnit.h
-* Read and imitate evilunit_selftest_main.c to create a main() function
+* Any module you define has signature int (*)(int, char**) so is a valid entry point
 * Link everything and run
 
 Features
@@ -22,6 +22,9 @@ Features
 * Implemented in the common subset of C and C++
 * No dynamic memory allocation
 * Works without standard libraries (slightly better with stdio)
+* Can invoke modules (with their dependencies) using llvm's interpreter
+* static MODULE(foo) {} marks the test function as internal
+* Header file disappears under the preprocessor if no modules are defined
 
 The interface is the set of macros defined in EvilUnit.h which provide the following
 ```
