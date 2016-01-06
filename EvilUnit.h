@@ -70,7 +70,7 @@
   void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num);\
 int evilunit_implementation(int (*root) (int, char **));
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 #define EVILUNIT_EXTERNAL extern "C" { EVILUNIT_EXTERNAL_FUNCTIONS }
 #else
 #define EVILUNIT_EXTERNAL EVILUNIT_EXTERNAL_FUNCTIONS
@@ -80,6 +80,7 @@ int evilunit_implementation(int (*root) (int, char **));
 #define EVILUNIT_CONCAT_DO(a__, b__) a__##b__
 #define EVILUNIT_MODULE_MANGLE(MODNAME) EVILUNIT_CONCAT(evilunit_node_,MODNAME)
 #define EVILUNIT_MODULE_DECLARE(MODNAME) int EVILUNIT_MODULE_MANGLE(MODNAME)(int instruction, char ** vstate)
+
 #ifdef __cplusplus
 #define EVILUNIT_CAST(TYPE,VARIABLE) reinterpret_cast<TYPE>(VARIABLE)
 #else
@@ -194,7 +195,7 @@ int evilunit_implementation(int (*root) (int, char **));
        void EVILUNIT_CONCAT(module_,MODNAME)(struct evilunit_module_state * evilunit_internal_state)
 
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 #define EVILUNIT_MAIN_MODULE()                                  \
   extern "C" {                                                  \
     EVILUNIT_MODULE_DECLARE(main_module);                       \

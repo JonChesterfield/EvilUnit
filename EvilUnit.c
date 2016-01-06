@@ -113,7 +113,25 @@ static int is_matching_dependency_number(struct evilunit_module_state * state)
   return (state->numeric_parameter == state->dependency_counter);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int evilunit_implementation_test(struct evilunit_module_state * state, const char *blockname);
+void evilunit_implementation_depends(struct evilunit_module_state * state, evilunit_node_type proposed);
+void evilunit_implementation_check(struct evilunit_module_state * S,
+                                   int check_resolved_to_this,
+                                   int line,
+                                   const char * check_string);
+void evilunit_implementation_set_string_parameter(struct evilunit_module_state * S, const char * str);
+void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num);
+void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, void * vtest, int direction);
+int evilunit_implementation(evilunit_node_type root);
+
+#ifdef __cplusplus
+}
+#endif
+
 int evilunit_implementation_test(struct evilunit_module_state * state, const char *blockname)
 {
   state->test_counter++;
@@ -140,7 +158,6 @@ int evilunit_implementation_test(struct evilunit_module_state * state, const cha
   return 0;
 }
 
-void evilunit_implementation_depends(struct evilunit_module_state * state, evilunit_node_type proposed);
 void evilunit_implementation_depends(struct evilunit_module_state * state, evilunit_node_type proposed)
 {
   state->dependency_counter++;
@@ -152,10 +169,6 @@ void evilunit_implementation_depends(struct evilunit_module_state * state, evilu
         }
     }
 }
-void evilunit_implementation_check(struct evilunit_module_state * S,
-                                   int check_resolved_to_this,
-                                   int line,
-                                   const char * check_string);
 
 void evilunit_implementation_check(struct evilunit_module_state * S,
                                    int check_resolved_to_this,
@@ -185,14 +198,12 @@ void evilunit_implementation_check(struct evilunit_module_state * S,
   return;
 }
 
-void evilunit_implementation_set_string_parameter(struct evilunit_module_state * S, const char * str);
 void evilunit_implementation_set_string_parameter(struct evilunit_module_state * S, const char * str)
 {
   S->string_parameter = str;
   return;
 }
 
-void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num);
 void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num)
 {
   S->numeric_parameter = num;
@@ -236,7 +247,6 @@ static void evilunit_retrieve_test_state(struct evilunit_test_state const * cons
   module->test.number_success = test->number_success;
 }
 
-void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, void * vtest, int direction);
 void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, void * vtest, int direction)
 {
   struct evilunit_test_state * test = EVILUNIT_CAST(struct evilunit_test_state *,vtest);
@@ -625,8 +635,6 @@ static void graph_collapse(evilunit_node_type root)
   evilunit_store_result(root,res);
 }
 
-/* Prototype is chosen to fit easily into main() */
-int evilunit_implementation(evilunit_node_type root);
 int evilunit_implementation(evilunit_node_type root)
 {
   struct evilunit_test_state result = evilunit_execute_everything(root);

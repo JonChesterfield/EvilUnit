@@ -58,4 +58,4 @@ Known limitations
 * The console printing is quite crude as I tend to view failing tests in a debugger. This will probably improve later.
 * The graph walking code is not thread safe.
 * Setting up the driver using MAIN_MODULE() is crude.
-* Linking tests in C with tests in C++ doesn't work (haven't yet set up the name mangling appropriately).
+* Linking tests in C with tests in C++ doesn't work (haven't worked out how to inject extern C without preventing static modules)
