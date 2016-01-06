@@ -103,16 +103,6 @@ static int evilunit_test_fail()
   return 2;
 }
 
-static int is_matching_test_number(struct evilunit_module_state * state)
-{
-  return (state->numeric_parameter == state->test_counter);
-}
-
-static int is_matching_dependency_number(struct evilunit_module_state * state)
-{
-  return (state->numeric_parameter == state->dependency_counter);
-}
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -132,29 +122,33 @@ int evilunit_implementation(evilunit_node_type root);
 }
 #endif
 
-int evilunit_implementation_test(struct evilunit_module_state * state, const char *blockname)
+int evilunit_implementation_test(struct evilunit_module_state *state,
+                                 const char *blockname)
 {
   state->test_counter++;
+  {
+    int is_matching_test_number =
+        (state->numeric_parameter == state->test_counter);
 
-  if (state->Q == run_one)
-    {
-      if (is_matching_test_number(state))
-        {
-          state->string_parameter = blockname;
-          state->test.testname_string = blockname;
-        }
-      return is_matching_test_number(state);
-    }
+    if (state->Q == run_one)
+      {
+        if (is_matching_test_number)
+          {
+            state->string_parameter = blockname;
+            state->test.testname_string = blockname;
+          }
+        return is_matching_test_number;
+      }
 
-  if (state->Q == get_name)
-    {
-      if (is_matching_test_number(state))
-        {
-          state->string_parameter = blockname;
-          state->test.testname_string = blockname;
-        }
-    }
-
+    if (state->Q == get_name)
+      {
+        if (is_matching_test_number)
+          {
+            state->string_parameter = blockname;
+            state->test.testname_string = blockname;
+          }
+      }
+  }
   return 0;
 }
 
@@ -163,7 +157,7 @@ void evilunit_implementation_depends(struct evilunit_module_state * state, evilu
   state->dependency_counter++;
   if (state->Q == get_dependency)
     {
-      if (is_matching_dependency_number(state))
+      if (state->numeric_parameter == state->dependency_counter)
         {
           state->traverse_parameter = proposed;
         }
@@ -276,46 +270,6 @@ static void clear_module_state(evilunit_node_type node, struct evilunit_module_s
   module->traverse_parameter = node;
 }
 
-/* These functions may be inlined later */
-
-static struct evilunit_module_state * require_run_this_test(struct evilunit_module_state * state, evilunit_node_type node, unsigned int num_to_run)
-{
-  clear_module_state(node,state);
-  state->Q = run_one;
-  state->numeric_parameter = num_to_run;
-  return state;
-}
-
-static struct evilunit_module_state * require_number_of_tests(struct evilunit_module_state * state, evilunit_node_type node)
-{
-  clear_module_state(node,state);
-  state->Q = how_many_tests;
-  return state;
-}
-
-static struct evilunit_module_state * require_number_of_dependencies(struct evilunit_module_state * state, evilunit_node_type node)
-{
-  clear_module_state(node,state);
-  state->Q = how_many_dependencies;
-  return state;
-}
-
-static struct evilunit_module_state * require_test_name(struct evilunit_module_state * state, evilunit_node_type node, unsigned int num_to_get)
-{
-  clear_module_state(node,state);
-  state->Q = get_name;
-  state->numeric_parameter = num_to_get;
-  return state;
-}
-
-static struct evilunit_module_state * require_dependency(struct evilunit_module_state * state, evilunit_node_type node, unsigned int num_to_get)
-{
-  clear_module_state(node,state);
-  state->Q = get_dependency;
-  state->numeric_parameter = num_to_get;
-  return state;
-}
-
 static void evilunit_call_state_only(evilunit_node_type node, int instruction, struct evilunit_module_state * S)
 {
   (void)node(instruction,EVILUNIT_CAST(char**,S));
@@ -345,7 +299,8 @@ static const char * evilunit_query_test_name(evilunit_node_type node, unsigned i
     {
       return evilunit_query_module_name(node);
     }
-  (void)require_test_name(&S,node,test);
+  clear_module_state(node,&S);
+  S.Q = get_name;
   S.numeric_parameter = test;
   (void)node(instruction,EVILUNIT_CAST(char**,(&S)));
   return S.string_parameter;
@@ -356,7 +311,9 @@ static evilunit_node_type evilunit_query_dependency(evilunit_node_type node, uns
   int instruction = evilunit_traverse_command_get_dependency_from_number;
   struct evilunit_module_state S;
   evilunit_node_type retval = node;
-  (void) require_dependency(&S,node,dependency);
+  clear_module_state(node,&S);
+  S.Q = get_dependency;
+  S.numeric_parameter = dependency;
   if (dependency > 0)
     {
       evilunit_call_state_only(node,instruction,&S);
@@ -369,7 +326,8 @@ static unsigned int evilunit_query_number_of_tests(evilunit_node_type node)
 {
   int instruction = evilunit_traverse_command_get_number_of_tests;
   struct evilunit_module_state S;
-  (void) require_number_of_tests(&S,node);
+  clear_module_state(node,&S);
+  S.Q = how_many_tests;
   evilunit_call_state_only(node,instruction,&S);
   return S.test_counter;
 }
@@ -378,7 +336,8 @@ static unsigned int evilunit_query_number_of_dependencies(evilunit_node_type nod
 {
   int instruction = evilunit_traverse_command_get_number_of_dependencies;
   struct evilunit_module_state S;
-  (void) require_number_of_dependencies(&S,node);
+  clear_module_state(node,&S);
+  S.Q = how_many_dependencies;
   evilunit_call_state_only(node,instruction,&S);
   return S.dependency_counter;
 }
@@ -403,7 +362,8 @@ static struct evilunit_test_state evilunit_execute_specific_test(evilunit_node_t
 {
   int instruction = evilunit_traverse_command_run_specific_test;
   struct evilunit_module_state S;
-  (void)require_run_this_test(&S,node,test);
+  clear_module_state(node,&S);
+  S.Q = run_one;
   S.numeric_parameter = test;
   evilunit_call_state_only(node,instruction,&S);
   if (S.test.result == evilunit_test_init())

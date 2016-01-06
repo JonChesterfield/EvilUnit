@@ -38,23 +38,27 @@
 #endif
 
 #if 0
-/* This kind of sucks. Perhaps an enum would still be better. */
-/* Execute all tests is keyed to 1 as that's the default for argc */
+/*
+ * The default behaviour is execute_all_tests
+ * argc is most likely to be 1 so execute_all_tests maps to this
+ * Other constants are negative so that no number of arguments passed
+ * on the command line can trigger one of these. 
+ */
 #endif
 #define evilunit_traverse_command_execute_all_tests (1)
-#define evilunit_traverse_command_get_number_of_tests (0)
-#define evilunit_traverse_command_get_number_of_dependencies (2)
-#define evilunit_traverse_command_get_test_name_from_number (3)
-#define evilunit_traverse_command_get_dependency_from_number (4)
-#define evilunit_traverse_command_run_specific_test (5)
-#define evilunit_traverse_command_get_module_name (6)
-#define evilunit_traverse_command_get_module_filename (7)
-#define evilunit_traverse_command_store_result (8)
-#define evilunit_traverse_command_retrieve_result (9)
-#define evilunit_traverse_command_mark_colour_white (10)
-#define evilunit_traverse_command_mark_colour_grey (11)
-#define evilunit_traverse_command_is_colour_white (12)
-#define evilunit_traverse_command_is_colour_grey (13)
+#define evilunit_traverse_command_get_number_of_tests (-1)
+#define evilunit_traverse_command_get_number_of_dependencies (-2)
+#define evilunit_traverse_command_get_test_name_from_number (-3)
+#define evilunit_traverse_command_get_dependency_from_number (-4)
+#define evilunit_traverse_command_run_specific_test (-5)
+#define evilunit_traverse_command_get_module_name (-6)
+#define evilunit_traverse_command_get_module_filename (-7)
+#define evilunit_traverse_command_store_result (-8)
+#define evilunit_traverse_command_retrieve_result (-9)
+#define evilunit_traverse_command_mark_colour_white (-10)
+#define evilunit_traverse_command_mark_colour_grey (-11)
+#define evilunit_traverse_command_is_colour_white (-12)
+#define evilunit_traverse_command_is_colour_grey (-13)
 
 #if 0
 /* External functions, implemented in evilunit.c */
@@ -134,10 +138,6 @@ int evilunit_implementation(int (*root) (int, char **));
     const unsigned int grey_colour = 1;                                 \
     switch(instruction)                                                 \
       {                                                                 \
-      case evilunit_traverse_command_execute_all_tests:                 \
-        {                                                               \
-          return evilunit_implementation(EVILUNIT_MODULE_MANGLE(MODNAME));\
-        }                                                               \
       case evilunit_traverse_command_get_number_of_tests:               \
       case evilunit_traverse_command_get_number_of_dependencies:        \
       case evilunit_traverse_command_get_dependency_from_number:        \
@@ -188,6 +188,11 @@ int evilunit_implementation(int (*root) (int, char **));
           evilunit_implementation_set_numeric_parameter                 \
             (state,(stored_node_colour == grey_colour) ? 1 : 0);        \
           break;                                                        \
+        }                                                               \
+      case evilunit_traverse_command_execute_all_tests:                 \
+      default:                                                          \
+        {                                                               \
+          return evilunit_implementation(EVILUNIT_MODULE_MANGLE(MODNAME));\
         }                                                               \
       }                                                                 \
     return 0;                                                           \
