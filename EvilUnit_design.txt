@@ -6,10 +6,17 @@ This library is intended to reduce the labour involved in writing test cases for
 
 3/ Easy to use in existing projects. Specifically, no external dependencies and an easy compilation model.
 
-The premise is to organise a set of tests in files containing a language that closely resembles C. Each file is viewed as a node in a graph defining the test dependencies.
+The premise is to write a set of related test function using approximately familiar syntax, MODULE(foobar){...}. Each module is compiled to a single external function, called evilunit_node_something, which allows functions within the library to traverse the graph of test cases. Provided one file is marked "main", or "root", to provide a starting point, control can be applied to how the test modules are executed. At present, a depth first search from the root node creates a set of test modules which are executed leaf first, sequentially, avoiding running the same test twice.
 
-Compilation turns each file into a single exposed function, called evilunit_node_something, which allows functions within the library to traverse this graph. Provided one file is marked "main", or "root", to provide a starting point, control can be applied to how the test modules are executed. At present, a depth first search from the root node creates a set of test modules which are executed leaf first, sequentially, avoiding running the same test twice.
+There is a choice to be made between header-only and header + source.
 
-The header file only contains macros, so if included in a file which does not use the provided functionality it disappears entirely under the preprocessor.
-The source file compiles to expose half a dozen or so symbols. 
-A MODULE() defined in user code exposes a single external symbol.
+Header + source:
+Faster compilation
+Wholly opaque datastructures
+Header disappears entirely under the preprocessor
+
+Header only:
+Easier to integrate with build systems
+Will emit a warning if #included, but the MODULE(){} construct is not used
+
+As far as the implementation of this library is concerned, it is better to be header + source. As far as the clients are concerned, it is easier to have a single file on the include path.
