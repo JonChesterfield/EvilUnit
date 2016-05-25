@@ -19,4 +19,6 @@ Header only:
 Easier to integrate with build systems
 Will emit a warning if #included, but the MODULE(){} construct is not used
 
-As far as the implementation of this library is concerned, it is better to be header + source. As far as the clients are concerned, it is easier to have a single file on the include path.
+As far as the implementation of this library is concerned, it is better to be header + source. As far as the clients are concerned, it is easier to have a single file on the include path. 
+
+Previously, this was header + source. Recently this has changed to header-only. The EvilUnit.c file contains self-test code only.
