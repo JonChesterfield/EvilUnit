@@ -9,8 +9,8 @@ This is considered alpha quality, in that I've been using it for about a year. I
 The purpose is to minimise the boilerplate involved in writing unit tests in the lowest common demoninator of programming languages. The design goals and constraints may be considered eccentric, in which case I'd recommend the excellent Catch project (https://github.com/philsquared/Catch).
 
 To use
-* Compile EvilUnit.c
 * Include EvilUnit.h
+* Compile EvilUnit.c if you want to run the self tests
 * Any module you define has signature `int (*)(int, char**)` so is a valid entry point
 * Link everything and run
 
@@ -22,9 +22,7 @@ Features
 * Implemented in the common subset of C and C++
 * No dynamic memory allocation
 * Works without standard libraries (slightly better with stdio)
-* Can invoke modules (with their dependencies) using llvm's interpreter
-* static MODULE(foo) {} marks the test function as internal
-* Header file disappears under the preprocessor if no modules are defined
+* static MODULE(foo) {} marks the test module as internal
 
 The interface is the set of macros defined in EvilUnit.h which provide the following
 ```
@@ -57,5 +55,5 @@ MODULE(demo)
 Known limitations
 * The console printing is quite crude as I tend to view failing tests in a debugger. This will probably improve later.
 * The graph walking code is not thread safe.
-* Setting up the driver using MAIN_MODULE() is crude.
 * Linking tests in C with tests in C++ doesn't work (haven't worked out how to inject extern C without preventing static modules)
+* Providing your own main may be considered undesirable
