@@ -50,8 +50,8 @@ static MODULE(call_a_test_that_does_not_exist)
 static MODULE(evilunit_selftest_run_specific_test)
 {
   unsigned int test_to_run = 0;
-  struct evilunit_test_state answer = make_test_state("set_of_unary_tests");
-  struct evilunit_test_state expect = make_test_state("set_of_unary_tests");
+  struct evilunit_test_state answer = evilunit_make_test_state("set_of_unary_tests");
+  struct evilunit_test_state expect = evilunit_make_test_state("set_of_unary_tests");
   evilunit_node_type unary = EVILUNIT_MODULE_MANGLE(set_of_unary_tests);
 
   TEST("Can call the zeroth test explicitly")

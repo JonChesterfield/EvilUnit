@@ -71,8 +71,8 @@ static MODULE(module_with_dependency)
 
 static MODULE(get_module_name_from_test)
 {
-  struct evilunit_test_state expect = make_test_state("");
-  struct evilunit_test_state result = make_test_state("");
+  struct evilunit_test_state expect = evilunit_make_test_state("");
+  struct evilunit_test_state result = evilunit_make_test_state("");
 
   DEPENDS(evilunit_string_equal);
 

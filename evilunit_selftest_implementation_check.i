@@ -31,7 +31,7 @@ static MODULE(evilunit_selftest_implementation_check)
   int check_state = 1;
   int line = 42;
   const char teststring [] = "foo";
-  clear_module_state(EVILUNIT_MODULE_MANGLE(fake_module),&S);
+  evilunit_clear_module_state(EVILUNIT_MODULE_MANGLE(fake_module),&S);
   
   TEST("A true result passed to a new module_state sets flag to PASS")
     {

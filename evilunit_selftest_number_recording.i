@@ -79,8 +79,8 @@ static MODULE(number_recording_specific_test)
   evilunit_node_type passing = EVILUNIT_MODULE_MANGLE(count_checks_passing_target);
   evilunit_node_type failing = EVILUNIT_MODULE_MANGLE(count_checks_failing_target);
   evilunit_node_type mixture = EVILUNIT_MODULE_MANGLE(count_checks_mixture_target);
-  struct evilunit_test_state expect = make_test_state("");
-  struct evilunit_test_state result = make_test_state("");
+  struct evilunit_test_state expect = evilunit_make_test_state("");
+  struct evilunit_test_state result = evilunit_make_test_state("");
 
   TEST("no checks in empty module")
     {
@@ -158,8 +158,8 @@ static MODULE(number_recording_specific_test)
 
 static MODULE(number_recording_execute_all_tests)
 {
-  struct evilunit_test_state expect = make_test_state("");
-  struct evilunit_test_state result = make_test_state("");
+  struct evilunit_test_state expect = evilunit_make_test_state("");
+  struct evilunit_test_state result = evilunit_make_test_state("");
 
    TEST("no checks in empty module")
     {

@@ -75,8 +75,8 @@ static MODULE(set_containing_failing_then_passing_then_failing_check)
 static MODULE(evilunit_selftest_module_contains_no_tests)
 {
   unsigned int test_to_run = 42; /* For these tests, any number will do */
-  struct evilunit_test_state answer = make_test_state("");
-  struct evilunit_test_state expect = make_test_state("");
+  struct evilunit_test_state answer = evilunit_make_test_state("");
+  struct evilunit_test_state expect = evilunit_make_test_state("");
   TEST("module with no checks returns pass")
     {
       expect.result = evilunit_test_pass();

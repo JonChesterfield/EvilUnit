@@ -79,7 +79,7 @@ static MODULE(multiple_checks)
 static MODULE(evilunit_selftest_multiple_checks_per_test)
 {
   unsigned int test_to_run = 0;
-  struct evilunit_test_state answer = make_test_state("multiple_checks");
+  struct evilunit_test_state answer = evilunit_make_test_state("multiple_checks");
   /*
    * CHECK() runs even when no test is active.
    * This test makes unusual use of CHECK, by using one call to evaluate every
