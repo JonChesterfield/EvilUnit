@@ -126,7 +126,7 @@ static void evilunit_implementation_check(struct evilunit_module_state * S,
                                    const char * check_string);
 static void evilunit_implementation_set_string_parameter(struct evilunit_module_state * S, const char * str);
 static void evilunit_implementation_set_numeric_parameter(struct evilunit_module_state * S, unsigned int num);
-static void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, void * vtest, int direction);
+static void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, struct evilunit_test_state * test, int direction);
 static int evilunit_implementation(evilunit_node_type root);
 
 #ifdef __cplusplus
@@ -267,9 +267,8 @@ static void evilunit_retrieve_test_state(struct evilunit_test_state const * cons
   module->test.number_success = test->number_success;
 }
 
-void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, void * vtest, int direction)
+void evilunit_implementation_manage_test_state(struct evilunit_module_state * module, struct evilunit_test_state * test, int direction)
 {
-  struct evilunit_test_state * test = EVILUNIT_CAST(struct evilunit_test_state *,vtest);
   if (direction == 0)
     {
       evilunit_store_test_state(module,test);
@@ -584,7 +583,6 @@ static void evilunit_collapse_graph(evilunit_node_type root)
   evilunit_store_result(root,res);
 }
 
-
 /*
  * Evaluate from entry node
  */
@@ -596,7 +594,6 @@ static int evilunit_implementation(evilunit_node_type root)
   evilunit_blat_output(root);
   return result.number_failure;
 }
-
 
 #if 0
 /*
@@ -611,17 +608,6 @@ static int evilunit_implementation(evilunit_node_type root)
 #define EVILUNIT_DEPENDS(X)                                             \
   {EVILUNIT_MODULE_DECLARE(X);                                          \
     evilunit_implementation_depends(evilunit_internal_state, &(EVILUNIT_MODULE_MANGLE(X)));}
-#if 0
-/*
- * MODULE expands to a function containing a union used to avoid exposing
- * the implementation of struct evilunit_test_state to the user code.
- * The obvious pointer to use is one to the char array, data. This however
- * triggers warnings about the different alignment requirements (e.g. 1 vs 8)
- * Since the union is providing a block of appropriately aligned storage,
- * and is never initialised or read through any of its members, we may as
- * well cast a pointer to the union itself.
- */
-#endif
 
 #define EVILUNIT_MODULE(MODNAME)                                        \
   EVILUNIT_MODULE_DECLARE(MODNAME);                                     \
@@ -631,17 +617,11 @@ static int evilunit_implementation(evilunit_node_type root)
   {                                                                     \
     struct evilunit_module_state * state =                              \
       EVILUNIT_CAST(struct evilunit_module_state *,vstate);             \
-    static union                                                        \
-    {                                                                   \
-      char data[4*sizeof(int) + 3*sizeof(const char *)];                \
-      int align0;                                                       \
-      unsigned int align1;                                              \
-      const char * align3;                                              \
-    } stored_test_state_storage;                                        \
-    void * stored_test_state = &stored_test_state_storage;              \
+    static struct evilunit_test_state stored_test_state;                \
     static int stored_node_colour;                                      \
     const unsigned int white_colour = 0;                                \
     const unsigned int grey_colour = 1;                                 \
+                                                                        \
     switch(instruction)                                                 \
       {                                                                 \
       case evilunit_traverse_command_get_number_of_tests:               \
@@ -665,12 +645,12 @@ static int evilunit_implementation(evilunit_node_type root)
         }                                                               \
       case evilunit_traverse_command_store_result:                      \
         {                                                               \
-          evilunit_implementation_manage_test_state(state,stored_test_state,0); \
+          evilunit_implementation_manage_test_state(state,&stored_test_state,0); \
           break;                                                        \
         }                                                               \
       case evilunit_traverse_command_retrieve_result:                   \
         {                                                               \
-          evilunit_implementation_manage_test_state(state,stored_test_state,1); \
+          evilunit_implementation_manage_test_state(state,&stored_test_state,1); \
           break;                                                        \
         }                                                               \
       case evilunit_traverse_command_mark_colour_white:                 \
