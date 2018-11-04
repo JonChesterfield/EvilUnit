@@ -10,12 +10,6 @@ LDCXX = clang++ -std=c++98 #Strangely, OSX terminal blows up if -x c++ is passed
 TEST = selftest.exe
 CXXTEST = selftest.cxx.exe
 
-SRC := EvilUnit.c
-
-OBJ := EvilUnit.o
-
-CXXOBJ := EvilUnit.cxx.o
-
 all:	$(TEST) $(CXXTEST)
 	./$(TEST)
 	./$(CXXTEST)
@@ -26,10 +20,10 @@ all:	$(TEST) $(CXXTEST)
 %.cxx.o:	%.c EvilUnit.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(CXXTEST):	$(CXXOBJ) EvilUnit.cxx.o
+$(CXXTEST):	EvilUnit_selftest.cxx.o EvilUnit_main.cxx.o
 	$(LDCXX) $(CXXFLAGS) $^ -o $@
 
-$(TEST):	$(OBJ) EvilUnit.o
+$(TEST):	EvilUnit_selftest.o EvilUnit_main.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:

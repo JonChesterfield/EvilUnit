@@ -15,7 +15,7 @@
  * with EvilUnit. If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- * Copyright 2015 Jon Chesterfield. All rights reserved.
+ * Copyright 2015-2018 Jon Chesterfield. All rights reserved.
  */
 #include "EvilUnit.h"
 
@@ -132,7 +132,7 @@ static int evilunit_test_states_match(struct evilunit_test_state * lhs, struct e
 #include "evilunit_selftest_counting_tests.i"
 #include "evilunit_selftest_macros_for_names.i"
 
-static MODULE(evilunit_selftest)
+static MODULE(evilunit_selftest_nonrecursive)
 {
   DEPENDS(evilunit_selftest_implementation_check);
   DEPENDS(evilunit_selftest_counting_dependencies);
@@ -147,8 +147,8 @@ static MODULE(evilunit_selftest)
   DEPENDS(evilunit_selftest); /* Recursive sanity check */
 }
 
-MAIN_MODULE()
+MODULE(evilunit_selftest)
 {
-  DEPENDS(evilunit_selftest);
+  DEPENDS(evilunit_selftest_nonrecursive);
   DEPENDS(evilunit_selftest_recursive);
 }
