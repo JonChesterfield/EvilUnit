@@ -114,24 +114,25 @@ static int evilunit_test_pass() { return 1; }
 static int evilunit_test_fail() { return 2; }
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-static int evilunit_implementation_test(struct evilunit_module_state *state,
-                                        const char *blockname);
-static void evilunit_implementation_depends(struct evilunit_module_state *state,
-                                            evilunit_node_type proposed);
-static void evilunit_implementation_check(struct evilunit_module_state *S,
-                                          int check_resolved_to_this, int line,
-                                          const char *check_string);
-static void evilunit_implementation_set_string_parameter(
-    struct evilunit_module_state *S, const char *str);
-static void evilunit_implementation_set_numeric_parameter(
-    struct evilunit_module_state *S, unsigned int num);
-static void evilunit_implementation_manage_test_state(
-    struct evilunit_module_state *module, struct evilunit_test_state *test,
-    int direction);
-static int evilunit_implementation(evilunit_node_type root);
+  static int evilunit_implementation_test(struct evilunit_module_state *state,
+                                          const char *blockname);
+  static void evilunit_implementation_depends(
+      struct evilunit_module_state *state, evilunit_node_type proposed);
+  static void evilunit_implementation_check(struct evilunit_module_state *S,
+                                            int check_resolved_to_this,
+                                            int line, const char *check_string);
+  static void evilunit_implementation_set_string_parameter(
+      struct evilunit_module_state *S, const char *str);
+  static void evilunit_implementation_set_numeric_parameter(
+      struct evilunit_module_state *S, unsigned int num);
+  static void evilunit_implementation_manage_test_state(
+      struct evilunit_module_state *module, struct evilunit_test_state *test,
+      int direction);
+  static int evilunit_implementation(evilunit_node_type root);
 
 #ifdef __cplusplus
 }
@@ -563,26 +564,24 @@ static struct evilunit_test_state evilunit_output_visitor(
   struct evilunit_test_state state = evilunit_query_result(node);
   const char *modulename = state.module_string;
   const char *filename = evilunit_query_module_filename(node);
-  const char *pass =
-      EVILUNIT_ANSI_COLOUR_GREEN "Pass" EVILUNIT_ANSI_COLOUR_RESET;
-  const char *fail = EVILUNIT_ANSI_COLOUR_RED "Fail" EVILUNIT_ANSI_COLOUR_RESET;
   int have_failure =
       state.number_failure > 0 || state.result == evilunit_test_fail();
-  const char *status = (have_failure) ? fail : pass;
 
   int number_checks = state.number_failure + state.number_success;
   if (number_checks > 0)
     {
-      printf("[ %s ] %u/%u %s", status, state.number_failure, number_checks,
-             modulename);
       if (!have_failure)
         {
-          printf("\n");
+          printf("[ " EVILUNIT_ANSI_COLOUR_GREEN
+                 "Pass" EVILUNIT_ANSI_COLOUR_RESET " ] %u/%u %s\n",
+                 state.number_failure, number_checks, modulename);
         }
       else
         {
-          printf(" %s(%u): \"%s\" %s\n", filename, state.line,
-                 state.testname_string, state.check_string);
+          printf("[ " EVILUNIT_ANSI_COLOUR_RED "Fail" EVILUNIT_ANSI_COLOUR_RESET
+                 " ] %u/%u %s %s(%u): \"%s\" %s\n",
+                 state.number_failure, number_checks, modulename, filename,
+                 state.line, state.testname_string, state.check_string);
         }
     }
 
@@ -655,7 +654,8 @@ static int evilunit_implementation(evilunit_node_type root)
     EVILUNIT_MODULE_DECLARE(X);                                    \
     evilunit_implementation_depends(evilunit_internal_state,       \
                                     &(EVILUNIT_MODULE_MANGLE(X))); \
-  }
+  }                                                                \
+  (void)0
 
 #define EVILUNIT_MODULE(MODNAME)                                               \
   EVILUNIT_MODULE_DECLARE(MODNAME);                                            \
@@ -749,8 +749,9 @@ static MODULE(create_a_module_or_delete_the_include_to_silence_warning)
 
 #ifdef __cplusplus
 #define EVILUNIT_MAIN_MODULE()                                         \
-  extern "C" {                                                         \
-  EVILUNIT_MODULE_DECLARE(main_module);                                \
+  extern "C"                                                           \
+  {                                                                    \
+    EVILUNIT_MODULE_DECLARE(main_module);                              \
   }                                                                    \
   int main(void) { return EVILUNIT_MODULE_MANGLE(main_module)(1, 0); } \
   MODULE(main_module)
