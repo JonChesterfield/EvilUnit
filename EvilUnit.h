@@ -43,7 +43,13 @@
 #endif
 
 #if EVILUNIT_USE_STDIO
+#ifdef EVILUNIT_PRECOMPILE_ONLY
+#define EVILUNIT_TMP #include <stdio.h>
+EVILUNIT_TMP
+#undef EVILUNIT_TMP
+#else
 #include <stdio.h>
+#endif
 #endif
 
 #if 0
