@@ -754,17 +754,17 @@ static MODULE(create_a_module_or_delete_the_include_to_silence_warning)
 }
 
 #ifdef __cplusplus
-#define EVILUNIT_MAIN_MODULE()                        \
-  extern "C"                                          \
-  {                                                   \
-    EVILUNIT_MODULE_DECLARE(main_module);             \
-  }                                                   \
-  int main(int argc, char **argv)                     \
-  {                                                   \
-    (void)argc;                                       \
-    (void)argv;                                       \
-    return EVILUNIT_MODULE_MANGLE(main_module)(1, 0); \
-  }                                                   \
+#define EVILUNIT_MAIN_MODULE()                          \
+  extern "C"                                            \
+  {                                                     \
+    EVILUNIT_MODULE_DECLARE(main_module);               \
+    int main(int argc, char **argv)                     \
+    {                                                   \
+      (void)argc;                                       \
+      (void)argv;                                       \
+      return EVILUNIT_MODULE_MANGLE(main_module)(1, 0); \
+    }                                                   \
+  }                                                     \
   MODULE(main_module)
 #else
 #define EVILUNIT_MAIN_MODULE()                        \
