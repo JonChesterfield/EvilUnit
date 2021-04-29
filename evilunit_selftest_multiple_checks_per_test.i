@@ -15,7 +15,7 @@
  * with EvilUnit. If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- * Copyright 2015-2018 Jon Chesterfield. All rights reserved.
+ * Copyright Jon Chesterfield. All rights reserved.
  */
 #include "EvilUnit.h"
 

@@ -15,7 +15,7 @@
  * with EvilUnit. If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- * Copyright 2015-2018 Jon Chesterfield. All rights reserved.
+ * Copyright Jon Chesterfield. All rights reserved.
  */
 #ifndef EVILUNIT_TEST_FRAMEWORK_HEADER
 #define EVILUNIT_TEST_FRAMEWORK_HEADER
@@ -34,6 +34,14 @@
 
 #ifndef EVILUNIT_USE_STDIO
 #define EVILUNIT_USE_STDIO 1
+#ifdef EVILUNIT_HAVE_PRINTF
+#undef EVILUNIT_HAVE_PRINTF
+#endif
+#define EVILUNIT_HAVE_PRINTF 1
+#endif
+
+#ifndef EVILUNIT_HAVE_PRINTF
+#define EVILUNIT_HAVE_PRINTF 0
 #endif
 
 #if 0
@@ -560,7 +568,7 @@ static struct evilunit_test_state evilunit_collapse_reducor(
   return result;
 }
 
-#if EVILUNIT_USE_STDIO
+#if EVILUNIT_HAVE_PRINTF
 #define EVILUNIT_ANSI_COLOUR_RED "\x1b[31m"
 #define EVILUNIT_ANSI_COLOUR_GREEN "\x1b[32m"
 #define EVILUNIT_ANSI_COLOUR_RESET "\x1b[0m"
@@ -604,7 +612,7 @@ static void evilunit_blat_output(evilunit_node_type root)
   (void)res;
 }
 
-#else /* ! EVILUNIT_USE_STDIO */
+#else /* ! EVILUNIT_HAVE_PRINTF */
 static void evilunit_blat_output(evilunit_node_type root)
 {
   struct evilunit_test_state nop = evilunit_make_test_state("nop");
