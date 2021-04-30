@@ -37,13 +37,13 @@ static MODULE(evilunit_selftest_implementation_check)
     {
       check_state = 1;
       evilunit_implementation_check(&S,check_state,line,teststring);
-      CHECK(S.test.result == evilunit_test_pass());
+      CHECK(S.test.result == evilunit_test_result_pass);
     }
 
     TEST("A false result passed to a new module_state sets flag to FAIL")
     {
       check_state = 0;
       evilunit_implementation_check(&S,check_state,line,teststring);
-      CHECK(S.test.result == evilunit_test_fail());
+      CHECK(S.test.result == evilunit_test_result_fail);
     }
 }

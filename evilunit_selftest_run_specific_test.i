@@ -56,7 +56,7 @@ static MODULE(evilunit_selftest_run_specific_test)
 
   TEST("Can call the zeroth test explicitly")
     {
-      expect.result = evilunit_test_pass();
+      expect.result = evilunit_test_result_pass;
       expect.check_string = "42==42";
       expect.testname_string = "set_of_unary_tests";
       test_to_run = 0;
@@ -66,7 +66,7 @@ static MODULE(evilunit_selftest_run_specific_test)
 
   TEST("Can call the first test explicitly")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "0!=0";
       expect.testname_string = "test one";
       test_to_run = 1;
@@ -76,7 +76,7 @@ static MODULE(evilunit_selftest_run_specific_test)
 
   TEST("Can call the second test explicitly")
     {
-      expect.result = evilunit_test_pass();
+      expect.result = evilunit_test_result_pass;
       expect.check_string = "1==1";
       expect.testname_string = "test two";
       test_to_run = 2;
@@ -86,7 +86,7 @@ static MODULE(evilunit_selftest_run_specific_test)
 
   TEST("Can call the third test explicitly")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "2!=2";
       expect.testname_string = "test three";
       test_to_run = 3;
@@ -96,7 +96,7 @@ static MODULE(evilunit_selftest_run_specific_test)
 
   TEST("Calling a test that does not exist (when there are also no checks) returns pass and an empty string")
     {
-      expect.result = evilunit_test_pass();
+      expect.result = evilunit_test_result_pass;
       expect.check_string = "";
       expect.testname_string = "call_a_test_that_does_not_exist";
       test_to_run = 2;

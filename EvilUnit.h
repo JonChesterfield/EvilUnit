@@ -68,21 +68,24 @@ EVILUNIT_TMP
  * on the command line can trigger one of these. 
  */
 #endif
-#define evilunit_traverse_command_execute_all_tests (1)
-#define evilunit_traverse_command_get_number_of_tests (-1)
-#define evilunit_traverse_command_get_number_of_dependencies (-2)
-#define evilunit_traverse_command_get_test_name_from_number (-3)
-#define evilunit_traverse_command_get_dependency_from_number (-4)
-#define evilunit_traverse_command_run_specific_test (-5)
-#define evilunit_traverse_command_get_module_name (-6)
-#define evilunit_traverse_command_get_module_filename (-7)
-#define evilunit_traverse_command_store_result (-8)
-#define evilunit_traverse_command_retrieve_result (-9)
-#define evilunit_traverse_command_mark_colour_white (-10)
-#define evilunit_traverse_command_mark_colour_grey (-11)
-#define evilunit_traverse_command_is_colour_white (-12)
-#define evilunit_traverse_command_is_colour_grey (-13)
 
+enum
+{
+  evilunit_traverse_command_execute_all_tests = 1,
+  evilunit_traverse_command_get_number_of_tests = -1,
+  evilunit_traverse_command_get_number_of_dependencies = -2,
+  evilunit_traverse_command_get_test_name_from_number = -3,
+  evilunit_traverse_command_get_dependency_from_number = -4,
+  evilunit_traverse_command_run_specific_test = -5,
+  evilunit_traverse_command_get_module_name = -6,
+  evilunit_traverse_command_get_module_filename = -7,
+  evilunit_traverse_command_store_result = -8,
+  evilunit_traverse_command_retrieve_result = -9,
+  evilunit_traverse_command_mark_colour_white = -10,
+  evilunit_traverse_command_mark_colour_grey = -11,
+  evilunit_traverse_command_is_colour_white = -12,
+  evilunit_traverse_command_is_colour_grey = -13
+};
 struct evilunit_module_state;
 typedef int (*evilunit_node_type)(int instruction, char **state);
 typedef struct evilunit_test_state (*evilunit_visit)(evilunit_node_type);
@@ -121,11 +124,12 @@ struct evilunit_module_state
   evilunit_node_type traverse_parameter;
 };
 
-static int evilunit_test_init() { return 0; }
-
-static int evilunit_test_pass() { return 1; }
-
-static int evilunit_test_fail() { return 2; }
+enum
+{
+  evilunit_test_result_init = 0,
+  evilunit_test_result_pass = 1,
+  evilunit_test_result_fail = 2
+};
 
 #ifdef __cplusplus
 extern "C"
@@ -143,9 +147,6 @@ extern "C"
       struct evilunit_module_state *S, const char *str);
   static void evilunit_implementation_set_numeric_parameter(
       struct evilunit_module_state *S, unsigned int num);
-  static void evilunit_implementation_manage_test_state(
-      struct evilunit_module_state *module, struct evilunit_test_state *test,
-      int direction);
   static int evilunit_implementation(evilunit_node_type root);
 
 #ifdef __cplusplus
@@ -222,13 +223,13 @@ void evilunit_implementation_check(struct evilunit_module_state *S,
       ongoing->number_failure += 1;
     }
 
-  if (ongoing->result == evilunit_test_fail())
+  if (ongoing->result == evilunit_test_result_fail)
     {
       return;
     }
 
-  ongoing->result =
-      (check_resolved_to_this) ? evilunit_test_pass() : evilunit_test_fail();
+  ongoing->result = (check_resolved_to_this) ? evilunit_test_result_pass
+                                             : evilunit_test_result_fail;
   ongoing->line = line;
   ongoing->check_string = check_string;
   ongoing->testname_string = S->string_parameter;
@@ -260,7 +261,7 @@ static struct evilunit_test_state evilunit_make_test_state(
   retval.check_string = "";
   retval.testname_string = module_name;
   retval.module_string = module_name;
-  retval.result = evilunit_test_init();
+  retval.result = evilunit_test_result_init;
   retval.line = 0;
   retval.number_failure = 0;
   retval.number_success = 0;
@@ -291,20 +292,6 @@ static void evilunit_retrieve_test_state(
   module->test.module_string = test->module_string;
   module->test.number_failure = test->number_failure;
   module->test.number_success = test->number_success;
-}
-
-void evilunit_implementation_manage_test_state(
-    struct evilunit_module_state *module, struct evilunit_test_state *test,
-    int direction)
-{
-  if (direction == 0)
-    {
-      evilunit_store_test_state(module, test);
-    }
-  else
-    {
-      evilunit_retrieve_test_state(test, module);
-    }
 }
 
 static const char *evilunit_query_module_name(evilunit_node_type node);
@@ -409,9 +396,9 @@ static struct evilunit_test_state evilunit_execute_specific_test(
   S.Q = run_one;
   S.numeric_parameter = test;
   evilunit_call_state_only(node, instruction, &S);
-  if (S.test.result == evilunit_test_init())
+  if (S.test.result == evilunit_test_result_init)
     {
-      S.test.result = evilunit_test_pass();
+      S.test.result = evilunit_test_result_pass;
     }
   return S.test;
 }
@@ -499,7 +486,7 @@ static struct evilunit_test_state evilunit_combine_test_state(
     struct evilunit_test_state previous, struct evilunit_test_state current)
 {
   if ((previous.number_failure == 0) &&
-      (current.result == evilunit_test_fail()))
+      (current.result == evilunit_test_result_fail))
     {
       previous.check_string = current.check_string;
       previous.line = current.line;
@@ -523,7 +510,7 @@ static struct evilunit_test_state evilunit_execute_all_tests(
       evilunit_make_test_state(evilunit_query_module_name(node));
 
   struct evilunit_test_state already_executed = evilunit_query_result(node);
-  if (already_executed.result != evilunit_test_init())
+  if (already_executed.result != evilunit_test_result_init)
     {
       return already_executed;
     }
@@ -579,7 +566,7 @@ static struct evilunit_test_state evilunit_output_visitor(
   const char *modulename = state.module_string;
   const char *filename = evilunit_query_module_filename(node);
   int have_failure =
-      state.number_failure > 0 || state.result == evilunit_test_fail();
+      state.number_failure > 0 || state.result == evilunit_test_result_fail;
 
   int number_checks = state.number_failure + state.number_success;
   if (number_checks > 0)
@@ -671,6 +658,23 @@ static int evilunit_implementation(evilunit_node_type root)
   }                                                                \
   (void)0
 
+#if 0
+/* get_simt_lane returns value in [0 EVILUNIT_SIMT_WIDTH), defaults to 0/1*/
+#endif
+
+#ifdef __AMDGCN__
+#define EVILUNIT_SIMT_WIDTH __AMDGCN_WAVEFRONT_SIZE
+static unsigned evilunit_get_simt_lane(void)
+{
+  return __builtin_amdgcn_mbcnt_hi(~0u, __builtin_amdgcn_mbcnt_lo(~0u, 0u));
+}
+#endif
+
+#ifndef EVILUNIT_SIMT_WIDTH
+#define EVILUNIT_SIMT_WIDTH 1
+static unsigned evilunit_get_simt_lane(void) { return 0; }
+#endif
+
 #define EVILUNIT_MODULE(MODNAME)                                               \
   EVILUNIT_MODULE_DECLARE(MODNAME);                                            \
   static void EVILUNIT_CONCAT(module_, MODNAME)(struct evilunit_module_state * \
@@ -679,11 +683,14 @@ static int evilunit_implementation(evilunit_node_type root)
   {                                                                            \
     struct evilunit_module_state *state =                                      \
         EVILUNIT_CAST(struct evilunit_module_state *, vstate);                 \
-    static struct evilunit_test_state stored_test_state;                       \
-    static int stored_node_colour;                                             \
-    const unsigned int white_colour = 0;                                       \
-    const unsigned int grey_colour = 1;                                        \
-                                                                               \
+    static struct evilunit_test_state stored_test_state[EVILUNIT_SIMT_WIDTH];  \
+    static int stored_node_colour[EVILUNIT_SIMT_WIDTH];                        \
+    enum                                                                       \
+    {                                                                          \
+      white_colour = 0,                                                        \
+      grey_colour = 1                                                          \
+    };                                                                         \
+    const unsigned lane = evilunit_get_simt_lane();                            \
     switch (instruction)                                                       \
       {                                                                        \
         case evilunit_traverse_command_get_number_of_tests:                    \
@@ -707,36 +714,34 @@ static int evilunit_implementation(evilunit_node_type root)
           }                                                                    \
         case evilunit_traverse_command_store_result:                           \
           {                                                                    \
-            evilunit_implementation_manage_test_state(state,                   \
-                                                      &stored_test_state, 0);  \
+            evilunit_store_test_state(state, &stored_test_state[lane]);        \
             break;                                                             \
           }                                                                    \
         case evilunit_traverse_command_retrieve_result:                        \
           {                                                                    \
-            evilunit_implementation_manage_test_state(state,                   \
-                                                      &stored_test_state, 1);  \
+            evilunit_retrieve_test_state(&stored_test_state[lane], state);     \
             break;                                                             \
           }                                                                    \
         case evilunit_traverse_command_mark_colour_white:                      \
           {                                                                    \
-            stored_node_colour = white_colour;                                 \
+            stored_node_colour[lane] = white_colour;                           \
             break;                                                             \
           }                                                                    \
         case evilunit_traverse_command_mark_colour_grey:                       \
           {                                                                    \
-            stored_node_colour = grey_colour;                                  \
+            stored_node_colour[lane] = grey_colour;                            \
             break;                                                             \
           }                                                                    \
         case evilunit_traverse_command_is_colour_white:                        \
           {                                                                    \
             evilunit_implementation_set_numeric_parameter(                     \
-                state, (stored_node_colour == white_colour) ? 1 : 0);          \
+                state, (stored_node_colour[lane] == white_colour) ? 1 : 0);    \
             break;                                                             \
           }                                                                    \
         case evilunit_traverse_command_is_colour_grey:                         \
           {                                                                    \
             evilunit_implementation_set_numeric_parameter(                     \
-                state, (stored_node_colour == grey_colour) ? 1 : 0);           \
+                state, (stored_node_colour[lane] == grey_colour) ? 1 : 0);     \
             break;                                                             \
           }                                                                    \
         case evilunit_traverse_command_execute_all_tests:                      \
@@ -755,9 +760,9 @@ static MODULE(create_a_module_or_delete_the_include_to_silence_warning)
   DEPENDS(create_a_module_or_delete_the_include_to_silence_warning);
   TEST("")
   {
-    CHECK(evilunit_test_init() == 0);
-    CHECK(evilunit_test_pass() == 1);
-    CHECK(evilunit_test_fail() == 2);
+    CHECK(evilunit_test_result_init == 0);
+    CHECK(evilunit_test_result_pass == 1);
+    CHECK(evilunit_test_result_fail == 2);
   }
 }
 

@@ -91,7 +91,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("module with no checks or tests returns pass")
     {
-      expect.result = evilunit_test_pass();
+      expect.result = evilunit_test_result_pass;
       expect.check_string = "";
       expect.testname_string = "multiple_checks";
       test_to_run = 0;
@@ -99,7 +99,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("test with no checks returns pass")
     {
-      expect.result = evilunit_test_pass();
+      expect.result = evilunit_test_result_pass;
       expect.check_string = "";
       expect.testname_string = "no checks";
       test_to_run = 1;
@@ -107,7 +107,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("single check can pass")
     {
-      expect.result = evilunit_test_pass();
+      expect.result = evilunit_test_result_pass;
       expect.check_string = "1==1";
       expect.testname_string = "one passing";
       test_to_run = 2;
@@ -115,7 +115,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("single check can fail")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "2!=2";
       expect.testname_string = "one failing";
       test_to_run = 3;
@@ -123,7 +123,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("pass then fail, fail wins")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "3!=3";
       expect.testname_string = "{pass,fail}";
       test_to_run = 4;
@@ -131,7 +131,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("fail then pass, fail wins")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "4!=4";
       expect.testname_string = "{fail,pass}";
       test_to_run = 5;
@@ -139,7 +139,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("pass then pass, second wins")
     {
-      expect.result = evilunit_test_pass();
+      expect.result = evilunit_test_result_pass;
       expect.check_string = "5==5";
       expect.testname_string = "{pass,pass}";
       test_to_run = 6;
@@ -147,7 +147,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("fail then fail, first wins")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "6!=6";
       expect.testname_string = "{fail,fail}";
       test_to_run = 7;
@@ -155,7 +155,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("fail wins even when passes before and after")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "7!=7";
       expect.testname_string = "{pass,fail,pass}";
       test_to_run = 8;
@@ -163,7 +163,7 @@ static MODULE(evilunit_selftest_multiple_checks_per_test)
 
   TEST("first fail wins even when separated by passes")
     {
-      expect.result = evilunit_test_fail();
+      expect.result = evilunit_test_result_fail;
       expect.check_string = "8!=8";
       expect.testname_string = "{fail,pass,fail}";
       test_to_run = 9;
