@@ -666,7 +666,13 @@ static int evilunit_implementation(evilunit_node_type root)
 #define EVILUNIT_SIMT_WIDTH __AMDGCN_WAVEFRONT_SIZE
 static unsigned evilunit_get_simt_lane(void)
 {
+#if EVILUNIT_SIMT_WIDTH == 64
   return __builtin_amdgcn_mbcnt_hi(~0u, __builtin_amdgcn_mbcnt_lo(~0u, 0u));
+#elif EVILUNIT_SIMT_WIDTH == 32
+  return __builtin_amdgcn_mbcnt_lo(~0u, 0u);
+#else
+#error "Unimplemented get_simt_lane on amdgcn"
+#endif
 }
 #endif
 
