@@ -575,8 +575,9 @@ static struct evilunit_test_state evilunit_output_visitor(
         }
       else
         {
+          /* format filename:line is understood by emacs compilation buffer */
           printf("[ " EVILUNIT_ANSI_COLOUR_RED "Fail" EVILUNIT_ANSI_COLOUR_RESET
-                 " ] %u/%u %s %s(%u): \"%s\" %s\n",
+                 " ] %u/%u %s %s:%u \"%s\" %s\n",
                  state.number_failure, number_checks, modulename, filename,
                  state.line, state.testname_string, state.check_string);
         }
@@ -643,6 +644,11 @@ static int evilunit_implementation(evilunit_node_type root)
 #define EVILUNIT_TEST(blockname) \
   if (evilunit_implementation_test(evilunit_internal_state, blockname))
 
+/* New, undocumented - dig out the name from the surrounding TEST("") or
+ * MODULE() */
+#define EVILUNIT_CURRENT_TEST_NAME() \
+  evilunit_internal_state->test.testname_string
+
 #if 0
 /* Declaration and call within a block to support C89 */
 #endif
@@ -675,6 +681,16 @@ static unsigned evilunit_get_simt_lane(void)
 #ifndef EVILUNIT_SIMT_WIDTH
 #define EVILUNIT_SIMT_WIDTH 1
 static unsigned evilunit_get_simt_lane(void) { return 0; }
+#endif
+
+/* Avoid unused parameter warning on empty module */
+#ifndef __has_attribute
+#define __has_attribute(x) 0
+#endif
+#if __has_attribute(maybe_unused)
+#define EVILUNIT_MAYBE_UNUSED __attribute__((maybe_unused))
+#else
+#define EVILUNIT_MAYBE_UNUSED
 #endif
 
 #define EVILUNIT_MODULE(MODNAME)                                               \
@@ -754,8 +770,9 @@ static unsigned evilunit_get_simt_lane(void) { return 0; }
       }                                                                        \
     return 0;                                                                  \
   }                                                                            \
-  void EVILUNIT_CONCAT(module_, MODNAME)(struct evilunit_module_state *        \
-                                         evilunit_internal_state)
+  void EVILUNIT_CONCAT(                                                        \
+      module_, MODNAME)(EVILUNIT_MAYBE_UNUSED struct evilunit_module_state *   \
+                        evilunit_internal_state)
 
 static MODULE(create_a_module_or_delete_the_include_to_silence_warning)
 {
