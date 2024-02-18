@@ -31,6 +31,7 @@
 #define MODULE(X) EVILUNIT_MODULE(X)
 #define MODULE_DECLARE(X) EVILUNIT_MODULE_DECLARE(X)
 #define MAIN_MODULE() EVILUNIT_MAIN_MODULE()
+#define DEATH(JMPBUF, X) EVILUNIT_DEATH(JMPBUF, X)
 
 #ifndef EVILUNIT_USE_STDIO
 #define EVILUNIT_USE_STDIO 1
@@ -38,6 +39,10 @@
 
 #ifndef EVILUNIT_HAVE_PRINTF
 #define EVILUNIT_HAVE_PRINTF EVILUNIT_USE_STDIO
+#endif
+
+#ifndef EVILUNIT_HAVE_SETJMP
+#define EVILUNIT_HAVE_SETJMP 1
 #endif
 
 #if 0
@@ -648,6 +653,29 @@ static int evilunit_implementation(evilunit_node_type root)
  * MODULE() */
 #define EVILUNIT_CURRENT_TEST_NAME() \
   evilunit_internal_state->test.testname_string
+
+#if EVILUNIT_HAVE_SETJMP
+#define EVILUNIT_DEATH(JMPBUF, X)                                              \
+  do {                                                                         \
+    if (setjmp(JMPBUF) == 0) {                                                 \
+      /* Jump frame is set up. Do the task:*/                                  \
+      (void)(X);                                                               \
+      /* If we get here it failed to jump through the death buffer */          \
+      evilunit_implementation_check(evilunit_internal_state, 0, __LINE__, #X); \
+    } else {                                                                   \
+      /* If we got here, indicate success*/                                    \
+      evilunit_implementation_check(evilunit_internal_state, 1, __LINE__, #X); \
+    }                                                                          \
+    /* Also want to put the jmp buffer back into a zero'd state */             \
+    unsigned char *dst = (unsigned char *)&(JMPBUF);                           \
+    for (size_t i = 0; i < sizeof(jmp_buf); i++) {                             \
+      dst[i] = 0;                                                              \
+    }                                                                          \
+  } while (0)
+#else
+#define EVILUNIT_DEATH(JMPBUF, X)                                              \
+  {}
+#endif
 
 #if 0
 /* Declaration and call within a block to support C89 */
