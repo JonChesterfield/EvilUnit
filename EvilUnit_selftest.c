@@ -151,4 +151,5 @@ MODULE(evilunit_selftest)
 {
   DEPENDS(evilunit_selftest_nonrecursive);
   DEPENDS(evilunit_selftest_recursive);
+  DEPENDS(evilunit_contract);
 }

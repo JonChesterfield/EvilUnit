@@ -31,7 +31,8 @@
 #define MODULE(X) EVILUNIT_MODULE(X)
 #define MODULE_DECLARE(X) EVILUNIT_MODULE_DECLARE(X)
 #define MAIN_MODULE() EVILUNIT_MAIN_MODULE()
-#define DEATH(JMPBUF, X) EVILUNIT_DEATH(JMPBUF, X)
+#define DEATH(X) EVILUNIT_DEATH(X)
+#define LIVES(X) EVILUNIT_LIVES(X)
 
 #ifndef EVILUNIT_USE_STDIO
 #define EVILUNIT_USE_STDIO 1
@@ -39,10 +40,6 @@
 
 #ifndef EVILUNIT_HAVE_PRINTF
 #define EVILUNIT_HAVE_PRINTF EVILUNIT_USE_STDIO
-#endif
-
-#ifndef EVILUNIT_HAVE_SETJMP
-#define EVILUNIT_HAVE_SETJMP 1
 #endif
 
 #if 0
@@ -654,27 +651,58 @@ static int evilunit_implementation(evilunit_node_type root)
 #define EVILUNIT_CURRENT_TEST_NAME() \
   evilunit_internal_state->test.testname_string
 
-#if EVILUNIT_HAVE_SETJMP
-#define EVILUNIT_DEATH(JMPBUF, X)                                              \
-  do {                                                                         \
-    if (setjmp(JMPBUF) == 0) {                                                 \
-      /* Jump frame is set up. Do the task:*/                                  \
-      (void)(X);                                                               \
-      /* If we get here it failed to jump through the death buffer */          \
-      evilunit_implementation_check(evilunit_internal_state, 0, __LINE__, #X); \
-    } else {                                                                   \
-      /* If we got here, indicate success*/                                    \
-      evilunit_implementation_check(evilunit_internal_state, 1, __LINE__, #X); \
-    }                                                                          \
-    /* Also want to put the jmp buffer back into a zero'd state */             \
-    unsigned char *dst = (unsigned char *)&(JMPBUF);                           \
-    for (size_t i = 0; i < sizeof(jmp_buf); i++) {                             \
-      dst[i] = 0;                                                              \
-    }                                                                          \
-  } while (0)
-#else
-#define EVILUNIT_DEATH(JMPBUF, X)                                              \
-  {}
+/*
+ * Include the contract header if available and implement DEATH() using it
+ * death tests need to compile to no code if longjmp is unavailable
+ *
+ */
+
+#define EVILUNIT_DEATH(X) \
+  do                      \
+    {                     \
+    }                     \
+  while (0)
+#define EVILUNIT_LIVES(X) \
+  do                      \
+    {                     \
+    }                     \
+  while (0)
+
+#if __has_include("EvilUnit_contract.h")
+#include "EvilUnit_contract.h"
+#if EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION != \
+    EVILUNIT_CONTRACT_IMPLEMENTATION_NONE
+
+#undef EVILUNIT_DEATH
+#undef EVILUNIT_LIVES
+
+#define EVILUNIT_DEATH(X)                                                    \
+  do                                                                         \
+    {                                                                        \
+      int evilunit_contract_reached_continuation = 0;                        \
+      EVILUNIT_CONTRACT_FRAME((void)(X);                                     \
+                              evilunit_contract_reached_continuation = 0;    \
+                              , evilunit_contract_reached_continuation = 1;) \
+      evilunit_implementation_check(evilunit_internal_state,                 \
+                                    evilunit_contract_reached_continuation,  \
+                                    __LINE__, #X);                           \
+    }                                                                        \
+  while (0)
+
+#define EVILUNIT_LIVES(X)                                                    \
+  do                                                                         \
+    {                                                                        \
+      int evilunit_contract_reached_continuation = 0;                        \
+      EVILUNIT_CONTRACT_FRAME((void)(X);                                     \
+                              evilunit_contract_reached_continuation = 1;    \
+                              , evilunit_contract_reached_continuation = 0;) \
+      evilunit_implementation_check(evilunit_internal_state,                 \
+                                    evilunit_contract_reached_continuation,  \
+                                    __LINE__, #X);                           \
+    }                                                                        \
+  while (0)
+
+#endif
 #endif
 
 #if 0
@@ -715,9 +743,14 @@ static unsigned evilunit_get_simt_lane(void) { return 0; }
 #ifndef __has_attribute
 #define __has_attribute(x) 0
 #endif
+
+#ifdef __clang__
 #if __has_attribute(maybe_unused)
 #define EVILUNIT_MAYBE_UNUSED __attribute__((maybe_unused))
-#else
+#endif
+#endif
+
+#ifndef EVILUNIT_MAYBE_UNUSED
 #define EVILUNIT_MAYBE_UNUSED
 #endif
 
