@@ -88,18 +88,21 @@ unsigned long* evilunit_contract_depth_pointer(void);
  * Prefers compiler builtins to libc.
  */
 
+// has_builtin longjmp succeeds on aarch64 and then raises a fatal error in sema
 #ifndef EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION
-#if defined(__has_builtin)
-#if __has_builtin(__builtin_setjmp) && __has_builtin(__builtin_longjmp)
-#ifdef __clang__
-#define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION \
+  #if defined(__has_builtin)
+    #if __has_builtin(__builtin_setjmp) && __has_builtin(__builtin_longjmp)
+      #if defined(__x86_64__)
+        #ifdef __clang__
+#define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION        \
   EVILUNIT_CONTRACT_IMPLEMENTATION_CLANG
-#elif defined(__GNUC__)
+        #elif defined(__GNUC__)
 #define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION \
   EVILUNIT_CONTRACT_IMPLEMENTATION_GCC
-#endif
-#endif
-#endif
+        #endif
+      #endif
+    #endif
+  #endif
 #endif
 
 #ifndef EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION
