@@ -90,9 +90,9 @@ unsigned long* evilunit_contract_depth_pointer(void);
 
 // has_builtin longjmp succeeds on aarch64 and then raises a fatal error in sema
 #ifndef EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION
-  #if defined(__has_builtin)
-    #if __has_builtin(__builtin_setjmp) && __has_builtin(__builtin_longjmp)
-      #if defined(__x86_64__)
+  #if defined(__x86_64__)
+    #if defined(__has_builtin)
+      #if __has_builtin(__builtin_setjmp) && __has_builtin(__builtin_longjmp)
         #ifdef __clang__
 #define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION        \
   EVILUNIT_CONTRACT_IMPLEMENTATION_CLANG
@@ -103,18 +103,22 @@ unsigned long* evilunit_contract_depth_pointer(void);
       #endif
     #endif
   #endif
+
+  #if defined(__wasi__)
+  // Default to off until the behaviour is checked
+  #define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION        \
+    EVILUNIT_CONTRACT_IMPLEMENTATION_NONE
+  #endif
 #endif
 
 #ifndef EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION
-#if __STDC_HOSTED__
-#define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION \
-  EVILUNIT_CONTRACT_IMPLEMENTATION_LIBC
-#endif
-#endif
-
-#ifndef EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION
-#define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION \
-  EVILUNIT_CONTRACT_IMPLEMENTATION_NONE
+  #if __STDC_HOSTED__
+  #define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION \
+    EVILUNIT_CONTRACT_IMPLEMENTATION_LIBC
+  #else
+  #define EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION \
+    EVILUNIT_CONTRACT_IMPLEMENTATION_NONE
+  #endif
 #endif
 
 #if EVILUNIT_CONTRACT_DEFAULT_IMPLEMENTATION !=   \
@@ -138,6 +142,17 @@ unsigned long* evilunit_contract_depth_pointer(void);
 #define EVILUNIT_CONTRACT_IMPLEMENTATION_GCC_AVAILABLE 1
 #endif
 
+
+#ifdef __wasi__
+  #if !defined(__wasm_exception_handling__)
+    #undef EVILUNIT_CONTRACT_IMPLEMENTATION_LIBC_AVAILABLE
+    #define EVILUNIT_CONTRACT_IMPLEMENTATION_LIBC_AVAILABLE 0
+    #undef EVILUNIT_CONTRACT_IMPLEMENTATION_CLANG_AVAILABLE
+    #define EVILUNIT_CONTRACT_IMPLEMENTATION_CLANG_AVAILABLE 0
+  #endif
+#endif
+
+  
 /*
  * Any implementation can be enabled by defining the corresponding macro,
  * though things like asking for libc on a freestanding build will #error out
